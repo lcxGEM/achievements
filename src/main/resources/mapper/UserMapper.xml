@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzu.staff.achievement.mapper.UserMapper">
+    <!--开启mybatis二级缓存，开启后entity类要实现Serializable序列化接口-->
+<!--    <cache></cache>-->
+
+    <select id="queryAll" resultType="com.zzu.staff.achievement.entity.User">
+        select * from user
+    </select>
+
+    <select id="queryByDepartment" parameterType="java.lang.Integer" resultType="com.zzu.staff.achievement.entity.User">
+        select * from user where department_id = #{id}
+    </select>
+
+    <select id="queryById" parameterType="java.lang.Long" resultType="com.zzu.staff.achievement.entity.User">
+        select * from user where user_id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.zzu.staff.achievement.entity.User">
+        insert into user (user_name, passwd, sex, people_category, native_place, politics_status,
+              nation, phone_number, idcard, department_id, sum)
+        values (#{userName},#{passwd},#{sex},#{peopleCategory},#{nativePlace},#{politicsStatus},
+              #{nation},#{phoneNumber},#{idcard},#{departmentId},#{sum})
+    </insert>
+
+    <delete id="deleteById" parameterType="java.lang.Long">
+        delete from school where id = #{id}
+    </delete>
+
+
+    <update id="update" parameterType="com.zzu.staff.achievement.entity.User">
+<!--        update user set-->
+<!--        <if test="#{name}!=null">-->
+<!--            name = #{name},-->
+<!--        </if>-->
+<!--        <if test="#{sort}!=null">-->
+<!--            sort = #{sort},-->
+<!--        </if>-->
+<!--        <if test="#{schoolType}!=null">-->
+<!--            school_type = #{schoolType}-->
+<!--        </if>-->
+<!--        where id = #{id}-->
+    </update>
+</mapper>

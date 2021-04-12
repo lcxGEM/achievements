@@ -1,0 +1,26 @@
+server:
+  port: 18870
+  servlet:
+    context-path: /achievements
+spring:
+  datasource:
+    url: jdbc:mysql://47.96.2.117:3306/staff_management?serverTimezone=UTC&useUnicode=true&characterEncoding=utf-8
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: 123456
+    type: com.alibaba.druid.pool.DruidDataSource
+    filters: stat,wall,log4j2 # stat监控统计，和 DruidConfig 中的 statViewServlet 有关
+  mvc:
+    format:
+      date: YYYY-MM-DD HH:mm:ss
+mybatis:
+  mapper-locations: "classpath:mapper/*.xml"
+  configuration:
+    map-underscore-to-camel-case: true # 数据库字段命名和java驼峰命名之间的转换
+    #cache-enabled: true # mybatis 开启二级缓存
+# 分页插件
+pagehelper:
+  helperDialect: mysql
+  reasonable: true
+  supportMethodsArguments: true
+  params: count=countSql
