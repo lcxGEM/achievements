@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzu.staff.achievement.mapper.GradePassageMapper">
+    <select id="queryAll" resultType="com.zzu.staff.achievement.entity.GradePassage">
+        select * from grade_passage
+    </select>
+
+    <select id="queryByGradeId" parameterType="java.lang.Long" resultType="com.zzu.staff.achievement.entity.GradePassage">
+        select * from grade_passage where grade_id = #{id}
+    </select>
+
+    <select id="queryById" parameterType="java.lang.Long" resultType="com.zzu.staff.achievement.entity.GradePassage">
+        select * from grade_passage where passage_id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.zzu.staff.achievement.entity.GradePassage">
+        insert into grade_passage (grade_id, level, passage_name, doi, school_order, author_order, is_one, one_num,
+                                   partition, journal, passage_date, passage_url, passage_grade)
+        values (#{gradeId},#{level},#{passageName},#{doi},#{schoolOrder},#{isOne},#{oneNum},
+                #{partition},#{journal},#{passageDate},#{passageUrl},#{passageGrade})
+    </insert>
+
+    <delete id="deleteById" parameterType="java.lang.Long">
+        delete from grade_passage where passage_id = #{id}
+    </delete>
+
+    <update id="update" parameterType="com.zzu.staff.achievement.entity.GradePassage">
+        update grade_passage
+        <trim prefix="set" suffixOverrides=",">
+            <if test="level!=null">
+                level = #{level},
+            </if>
+            <if test="passageName!=null and passageName!=''">
+                passage_name = #{passageName},
+            </if>
+            <if test="doi!=null">
+                doi = #{doi},
+            </if>
+            <if test="schoolOrder!=null">
+                school_order = #{schoolOrder},
+            </if>
+            <if test="authorOrder!=null">
+                author_order = #{authorOrder},
+            </if>
+            <if test="isOne!=null">
+                is_one = #{isOne},
+            </if>
+            <if test="oneNum!=null">
+                one_num = #{oneNum},
+            </if>
+            <if test="partition!=null">
+                partition = #{partition},
+            </if>
+            <if test="journal!=null and journal!=''">
+                journal = #{journal},
+            </if>
+            <if test="passageDate!=null">
+                passage_date = #{passageDate},
+            </if>
+            <if test="passageUrl!=null and passageUrl!=''">
+                passage_url = #{passageUrl},
+            </if>
+            <if test="passageGrade!=null">
+                passage_grade = #{passageGrade},
+            </if>
+        </trim>
+        where passage_id = #{passageId}
+    </update>
+</mapper>

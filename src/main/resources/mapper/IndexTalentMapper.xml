@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzu.staff.achievement.mapper.IndexTalentMapper">
+    <select id="queryAll" resultType="com.zzu.staff.achievement.entity.IndexTalent">
+        select * from index_talent
+    </select>
+
+    <select id="queryById" parameterType="java.lang.Integer" resultType="com.zzu.staff.achievement.entity.IndexTalent">
+        select * from index_talent where talent_id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.zzu.staff.achievement.entity.IndexTalent">
+        insert into index_talent (talent_name, grade)
+        values (#{talentName},#{grade})
+    </insert>
+
+    <delete id="deleteById" parameterType="java.lang.Integer">
+        delete from index_talent where talent_id = #{id}
+    </delete>
+
+    <update id="update" parameterType="com.zzu.staff.achievement.entity.IndexTalent">
+        update index_talent
+        <trim prefix="set" suffixOverrides=",">
+            <if test="talentName!=null and talentName!=''">
+                talent_name = #{talentName},
+            </if>
+            <if test="grade gt 0 and grade != null">
+                grade = #{grade},
+            </if>
+        </trim>
+        where talent_id = #{talentId}
+    </update>
+</mapper>

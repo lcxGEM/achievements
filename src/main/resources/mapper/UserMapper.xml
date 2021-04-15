@@ -33,31 +33,31 @@
             <if test="userName!=null and userName!=''">
                 user_name = #{userName},
             </if>
-            <if test="passwd!=null and passwd!=null">
+            <if test="passwd!=null and passwd!=''">
                 passwd = #{passwd},
             </if>
             <if test="sex!=null">
                 sex = #{sex},
             </if>
-            <if test="peopleCategory!=null and peopleCategory!=null">
+            <if test="peopleCategory!=null and peopleCategory!=''">
                 people_category = #{peopleCategory},
             </if>
             <if test="nativePlace!=null and nativePlace!=''">
                 native_place = #{nativePlace},
             </if>
-            <if test="politicsStatus!=null and politicsStatus!=null">
+            <if test="politicsStatus!=null and politicsStatus!=''">
                 politics_status = #{politicsStatus},
             </if>
             <if test="nation!=null and nation!=''">
                 nation = #{nation},
             </if>
-            <if test="phoneNumber!=null and phoneNumber!=null">
+            <if test="phoneNumber!=null and phoneNumber!=''">
                 phone_number = #{phoneNumber},
             </if>
             <if test="idcard!=null and idcard!=''">
                 idcard = #{idcard},
             </if>
-            <if test="departmentId!=null and departmentId!=null">
+            <if test="departmentId!=null and departmentId!=''">
                 department_id = #{departmentId},
             </if>
             <if test="sum!=null and sum!=''">

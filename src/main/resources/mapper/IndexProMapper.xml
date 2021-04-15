@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzu.staff.achievement.mapper.IndexProMapper">
+    <select id="queryAll" resultType="com.zzu.staff.achievement.entity.IndexPro">
+        select * from index_pro
+    </select>
+
+    <select id="queryById" parameterType="java.lang.Integer" resultType="com.zzu.staff.achievement.entity.IndexPro">
+        select * from index_pro where pro_level_id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.zzu.staff.achievement.entity.IndexPro">
+        insert into index_pro (pro_level_name, pro_level_grade)
+        values (#{proLevelName},#{proLevelGrade})
+    </insert>
+
+    <delete id="deleteById" parameterType="java.lang.Integer">
+        delete from index_pro where pro_level_id = #{id}
+    </delete>
+
+    <update id="update" parameterType="com.zzu.staff.achievement.entity.IndexPro">
+        update index_pro
+        <trim prefix="set" suffixOverrides=",">
+            <if test="proLevelName!=null and proLevelName!=''">
+                pro_level_name = #{proLevelName},
+            </if>
+            <if test="proLevelGrade!=null">
+                pro_level_grade = #{proLevelGrade},
+            </if>
+
+        </trim>
+        where pro_level_id = #{proLevelId}
+    </update>
+</mapper>

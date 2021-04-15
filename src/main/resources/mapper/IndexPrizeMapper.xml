@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzu.staff.achievement.mapper.IndexPrizeMapper">
+    <select id="queryAllType" resultType="com.zzu.staff.achievement.entity.IndexPrizeType">
+        select * from index_prize_type
+    </select>
+
+    <select id="queryLevelByType" parameterType="java.lang.Integer" resultType="com.zzu.staff.achievement.entity.IndexPrizeLevel">
+        select * from index_prize_level where prize_type_id = #{id}
+    </select>
+
+    <select id="queryTypeById" parameterType="java.lang.Integer" resultType="com.zzu.staff.achievement.entity.IndexPrizeType">
+        select * from index_prize_type where prize_type_id = #{id}
+    </select>
+
+    <select id="queryLevelByTypeLevel" parameterType="java.lang.Integer" resultType="com.zzu.staff.achievement.entity.IndexPrizeLevel">
+        select * from index_prize_level where prize_level_id = #{level}
+    </select>
+
+    <delete id="deleteTypeById" parameterType="java.lang.Integer">
+        delete from index_prize_type where prize_type_id = #{id}
+    </delete>
+
+    <delete id="deleteLevelByType" parameterType="java.lang.Integer">
+        delete from index_prize_level where prize_type_id = #{id}
+    </delete>
+
+    <delete id="deleteLevelById" parameterType="java.lang.Integer">
+        delete from index_prize_level where prize_level_id = #{id}
+    </delete>
+
+    <insert id="insertType" useGeneratedKeys="true" keyProperty="prizeTypeId" parameterType="com.zzu.staff.achievement.entity.IndexPrizeType">
+        insert into index_prize_type (prize_type_name)
+        values (#{prizeTypeName})
+    </insert>
+
+    <insert id="insertLevel" parameterType="com.zzu.staff.achievement.entity.IndexPrizeLevel">
+        insert into index_prize_level (prize_type_id, prize_level_name, prize_level_grade)
+        values (#{prizeTypeId},#{prizeLevelName},#{prizeLevelGrade})
+    </insert>
+
+    <update id="updateType" parameterType="com.zzu.staff.achievement.entity.IndexPrizeType">
+        update index_prize_type
+        <trim prefix="set" suffixOverrides=",">
+            <if test="prizeTypeName!=null and prizeTypeName!=''">
+                prize_type_name = #{prizeTypeName},
+            </if>
+
+        </trim>
+        where prize_type_id = #{prizeTypeId}
+    </update>
+
+    <update id="updateLevel" parameterType="com.zzu.staff.achievement.entity.IndexPrizeLevel">
+        update index_prize_level
+        <trim prefix="set" suffixOverrides=",">
+
+            <if test="prizeLevelName!=null and prizeLevelName!=''">
+                prize_level_name = #{prizeLevelName},
+            </if>
+            <if test="prizeLevelGrade!=null">
+                prize_level_grade = #{prizeLevelGrade},
+            </if>
+
+        </trim>
+        where prize_level_id = #{prizeLevelId}
+    </update>
+
+</mapper>

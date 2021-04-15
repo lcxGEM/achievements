@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzu.staff.achievement.mapper.GradeProMapper">
+    <select id="queryAll" resultType="com.zzu.staff.achievement.entity.GradePro">
+        select * from grade_pro
+    </select>
+
+    <select id="queryByGradeId" parameterType="java.lang.Long" resultType="com.zzu.staff.achievement.entity.GradePro">
+        select * from grade_pro where grade_id = #{id}
+    </select>
+
+    <select id="queryById" parameterType="java.lang.Long" resultType="com.zzu.staff.achievement.entity.GradePro">
+        select * from grade_pro where program_id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.zzu.staff.achievement.entity.GradePro">
+        insert into grade_pro (grade_id, pro_name, pro_num, pro_level, host, pro_url)
+        values (#{gradeId},#{proName},#{proNum},#{proLevel},#{host},#{proUrl})
+    </insert>
+
+    <delete id="deleteById" parameterType="java.lang.Long">
+        delete from grade_pro where program_id = #{id}
+    </delete>
+
+    <update id="update" parameterType="com.zzu.staff.achievement.entity.GradePro">
+        update grade_pro
+        <trim prefix="set" suffixOverrides=",">
+            <if test="proName!=null and proName!=''">
+                pro_name = #{proName},
+            </if>
+            <if test="proNum!=null and proNum!=''">
+                pro_num = #{proNum},
+            </if>
+            <if test="proLevel!=null">
+                pro_level = #{proLevel},
+            </if>
+            <if test="host!=null">
+                host = #{host},
+            </if>
+            <if test="proUrl!=null and proUrl!=''">
+                pro_url = #{proUrl},
+            </if>
+        </trim>
+        where program_id = #{programId}
+    </update>
+</mapper>

@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzu.staff.achievement.mapper.ManagerMapper">
+
+    <select id="queryById" parameterType="java.lang.Long" resultType="com.zzu.staff.achievement.entity.Manager">
+        select * from manager,department where id= #{id} and department = department_id
+    </select>
+
+</mapper>

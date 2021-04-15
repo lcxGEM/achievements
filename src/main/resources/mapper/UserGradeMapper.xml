@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzu.staff.achievement.mapper.UserGradeMapper">
+
+    <select id="queryAll" resultType="com.zzu.staff.achievement.entity.UserGrade">
+        select * from user_grade
+    </select>
+
+    <select id="queryByUser" parameterType="java.lang.Long" resultType="com.zzu.staff.achievement.entity.UserGrade">
+        select * from user_grade where u_id = #{id}
+    </select>
+
+    <select id="queryById" parameterType="java.lang.Long" resultType="com.zzu.staff.achievement.entity.UserGrade">
+        select * from user_grade where grade_id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.zzu.staff.achievement.entity.UserGrade">
+        insert into user_grade (u_id, year, stu, talent, passage, program, prize, patent, result)
+        values (#{uId},#{year},#{stu},#{talent},#{passage},#{program},
+                #{prize},#{patent},#{result})
+    </insert>
+
+    <delete id="deleteById" parameterType="java.lang.Long">
+        delete from user_grade where grade_id = #{id}
+    </delete>
+
+    <update id="update" parameterType="com.zzu.staff.achievement.entity.UserGrade">
+        update user_grade
+        <trim prefix="set" suffixOverrides=",">
+            <if test="stu!=null">
+                stu = #{stu},
+            </if>
+            <if test="talent!=null">
+                talent = #{talent},
+            </if>
+            <if test="passage!=null">
+                passage = #{passage},
+            </if>
+            <if test="program!=null">
+                program = #{program},
+            </if>
+            <if test="prize!=null">
+                prize = #{prize},
+            </if>
+            <if test="patent!=null">
+                patent = #{patent},
+            </if>
+            <if test="result!=null">
+                result = #{result},
+            </if>
+        </trim>
+        where grade_id = #{gradeId}
+    </update>
+</mapper>

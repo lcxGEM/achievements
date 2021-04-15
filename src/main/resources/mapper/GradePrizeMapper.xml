@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzu.staff.achievement.mapper.GradePrizeMapper">
+    <select id="queryAll" resultType="com.zzu.staff.achievement.entity.GradePrize">
+        select * from grade_prize
+    </select>
+
+    <select id="queryByGradeId" parameterType="java.lang.Long" resultType="com.zzu.staff.achievement.entity.GradePrize">
+        select * from grade_prize where grade_id = #{id}
+    </select>
+
+    <select id="queryById" parameterType="java.lang.Long" resultType="com.zzu.staff.achievement.entity.GradePrize">
+        select * from grade_prize where prize_id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.zzu.staff.achievement.entity.GradePrize">
+        insert into grade_prize (grade_id, prize_name, prize_type, prize_level, prize_date, prize_school_order,
+                                 prize_author_order, prize_url, prize_grade)
+        values (#{gradeId},#{prizeName},#{prizeType},#{prizeLevel},#{prizeDate},#{prizeSchoolOrder},
+                #{prizeAuthorOrder},#{prizeUrl},#{prizeGrade})
+    </insert>
+
+    <delete id="deleteById" parameterType="java.lang.Long">
+        delete from grade_prize where prize_id = #{id}
+    </delete>
+
+    <update id="update" parameterType="com.zzu.staff.achievement.entity.GradePrize">
+        update grade_prize
+        <trim prefix="set" suffixOverrides=",">
+            <if test="gradeId!=null">
+                grade_id = #{gradeId},
+            </if>
+            <if test="prizeName!=null and prizeName!=''">
+                prize_name = #{prizeName},
+            </if>
+            <if test="prizeType!=null">
+                prize_type = #{prizeType},
+            </if>
+            <if test="prizeLevel!=null">
+                prize_level = #{prizeLevel},
+            </if>
+            <if test="prizeDate!=null">
+                prize_date = #{prizeDate},
+            </if>
+            <if test="prizeSchoolOrder!=null">
+                prize_school_order = #{prizeSchoolOrder},
+            </if>
+            <if test="prizeAuthorOrder!=null">
+                prize_author_order = #{prizeAuthorOrder},
+            </if>
+            <if test="prizeUrl!=null">
+                prize_url = #{prizeUrl},
+            </if>
+            <if test="prizeGrade!=null">
+                prize_grade = #{prizeGrade},
+            </if>
+        </trim>
+        where prize_id = #{prizeId}
+    </update>
+</mapper>
