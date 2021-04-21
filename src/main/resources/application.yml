@@ -10,7 +10,25 @@ spring:
     password: 123456
     type: com.alibaba.druid.pool.DruidDataSource
     filters: stat,wall,log4j2 #lcx
+  servlet:
+    multipart:
+      max-request-size: 100MB
+      max-file-size: 10MB
 mybatis:
   mapper-locations: "classpath:mapper/*.xml"
   configuration:
     map-underscore-to-camel-case: true
+stu:
+  A: 15
+  B: 10
+  K1: 1
+  K2: 2
+  K3: 1.5
+passage:
+  DTOP: 2400
+  TOP: 270
+  A: 120
+  B: 50
+patent:
+  A: 30
+  B: 10

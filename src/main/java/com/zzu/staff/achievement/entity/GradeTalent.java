@@ -19,4 +19,6 @@ public class GradeTalent {
     private Integer talentId;
 
     private String gradeUrl;
+
+    private Float talentGrade;
 }

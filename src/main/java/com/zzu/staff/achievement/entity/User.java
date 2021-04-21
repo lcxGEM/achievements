@@ -13,11 +13,11 @@ public class User {
 
     private String userName;
 
-    private String passwd;
+        private String passwd;
 
-    private int sex;
+    private Integer sex;
 
-    private int peopleCategory; //在职和引进
+    private Integer peopleCategory; //在职和引进
 
     private String nativePlace; //籍贯
 
@@ -30,6 +30,4 @@ public class User {
     private String idcard;
 
     private Integer departmentId;
-
-    private Float sum;
 }

@@ -26,4 +26,6 @@ public class GradePro {
     private Boolean host;
 
     private String proUrl;
+
+    private Float proGrade;
 }

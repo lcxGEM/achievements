@@ -1,8 +1,6 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.zzu.staff.achievement.mapper.UserMapper">
-    <!--开启mybatis二级缓存，开启后entity类要实现Serializable序列化接口-->
-<!--    <cache></cache>-->
 
     <select id="queryAll" resultType="com.zzu.staff.achievement.entity.User">
         select * from user
@@ -12,15 +10,38 @@
         select * from user where department_id = #{id}
     </select>
 
+    <select id="queryAllParam" resultType="com.zzu.staff.achievement.entity.UserParam">
+        select * from user,user_grade,department where user_id = u_id and year = #{year} and user.department_id = department.department_id
+        <if test="sName!=''">and user.user_name like CONCAT('%',#{sName},'%')</if>
+        <if test="sTel!=''">and user.phone_number like CONCAT('%',#{sTel},'%')</if>
+        <if test="sId!=''">and user.idcard like CONCAT('%',#{sId},'%')</if>
+        <if test="category gt 0">and people_category = #{category}</if>
+    </select>
+    
+    <select id="queryAllParamByParam" resultType="com.zzu.staff.achievement.entity.UserParam">
+        select * from user,user_grade,department where user_id = u_id and year = #{year} and user.department_id = department.department_id and department_id = #{sDepart}
+        <if test="sName!=''">and user.user_name like CONCAT('%',#{sName},'%')</if>
+        <if test="sTel!=''">and user.phone_number like CONCAT('%',#{sTel},'%')</if>
+        <if test="sId!=''">and user.idcard like CONCAT('%',#{sId},'%')</if>
+        <if test="category gt 0">and people_category = #{category}</if>
+    </select>
+
     <select id="queryById" parameterType="java.lang.Long" resultType="com.zzu.staff.achievement.entity.User">
         select * from user where user_id = #{id}
     </select>
 
     <insert id="insert" parameterType="com.zzu.staff.achievement.entity.User">
-        insert into user (user_name, passwd, sex, people_category, native_place, politics_status,
-              nation, phone_number, idcard, department_id, sum)
-        values (#{userName},#{passwd},#{sex},#{peopleCategory},#{nativePlace},#{politicsStatus},
-              #{nation},#{phoneNumber},#{idcard},#{departmentId},#{sum})
+        insert into user (user_id,user_name, passwd, sex, people_category, native_place, politics_status,
+              nation, phone_number, idcard, department_id)
+        values (#{userId},#{userName},#{passwd},#{sex},#{peopleCategory},#{nativePlace},#{politicsStatus},
+              #{nation},#{phoneNumber},#{idcard},#{departmentId})
+    </insert>
+
+    <insert id="insertA" parameterType="com.zzu.staff.achievement.entity.User">
+        insert into user (user_id,user_name, passwd, sex, people_category, native_place, politics_status,
+                          nation, phone_number, idcard, department_id)
+        values (#{userId},#{userName},#{passwd},#{sex},#{peopleCategory},#{nativePlace},#{politicsStatus},
+                #{nation},#{phoneNumber},#{idcard},#{departmentId})
     </insert>
 
     <delete id="deleteById" parameterType="java.lang.Long">
@@ -60,9 +81,7 @@
             <if test="departmentId!=null and departmentId!=''">
                 department_id = #{departmentId},
             </if>
-            <if test="sum!=null and sum!=''">
-                sum = #{sum},
-            </if>
+
         </trim>
         where user_id = #{userId}
     </update>

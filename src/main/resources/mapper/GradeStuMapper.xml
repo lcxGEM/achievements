@@ -17,8 +17,8 @@
     </select>
 
     <insert id="insert" parameterType="com.zzu.staff.achievement.entity.GradeStu">
-        insert into grade_stu (grade_id, stu_name, stu_id, boxin, bote, stu_grade)
-        values (#{gradeId},#{stuName},#{stuId},#{boxin},#{bote},#{stuGrade})
+        insert into grade_stu (grade_id, education, stu_name, stu_id, boxin, bote, stu_grade)
+        values (#{gradeId},#{education},#{stuName},#{stuId},#{boxin},#{bote},#{stuGrade})
     </insert>
 
     <delete id="deleteByGradeId" parameterType="java.lang.Long">

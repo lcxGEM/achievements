@@ -5,8 +5,8 @@
         select * from grade_pro
     </select>
 
-    <select id="queryByGradeId" parameterType="java.lang.Long" resultType="com.zzu.staff.achievement.entity.GradePro">
-        select * from grade_pro where grade_id = #{id}
+    <select id="queryByGradeId" parameterType="java.lang.Long" resultType="com.zzu.staff.achievement.entity.GradeProParam">
+        select * from grade_pro,index_pro where grade_id = #{id} and pro_level_id = pro_level
     </select>
 
     <select id="queryById" parameterType="java.lang.Long" resultType="com.zzu.staff.achievement.entity.GradePro">
@@ -14,8 +14,8 @@
     </select>
 
     <insert id="insert" parameterType="com.zzu.staff.achievement.entity.GradePro">
-        insert into grade_pro (grade_id, pro_name, pro_num, pro_level, host, pro_url)
-        values (#{gradeId},#{proName},#{proNum},#{proLevel},#{host},#{proUrl})
+        insert into grade_pro (grade_id, pro_name, pro_num, pro_level, host, pro_url,pro_grade)
+        values (#{gradeId},#{proName},#{proNum},#{proLevel},#{host},#{proUrl},#{proGrade})
     </insert>
 
     <delete id="deleteById" parameterType="java.lang.Long">

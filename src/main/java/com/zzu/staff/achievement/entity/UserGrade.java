@@ -28,4 +28,6 @@ public class UserGrade {
     private Float patent;
 
     private Float result;
+
+    private Float sum;
 }

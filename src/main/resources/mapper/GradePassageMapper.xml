@@ -14,10 +14,10 @@
     </select>
 
     <insert id="insert" parameterType="com.zzu.staff.achievement.entity.GradePassage">
-        insert into grade_passage (grade_id, level, passage_name, doi, school_order, author_order, is_one, one_num,
-                                   partition, journal, passage_date, passage_url, passage_grade)
-        values (#{gradeId},#{level},#{passageName},#{doi},#{schoolOrder},#{isOne},#{oneNum},
-                #{partition},#{journal},#{passageDate},#{passageUrl},#{passageGrade})
+        insert into grade_passage(grade_id, level, passage_name, doi, school_order, author_order, is_one, one_num, `partition`,
+                                  journal, passage_date, passage_url, passage_url2, passage_grade)
+        values (#{gradeId},#{level},#{passageName},#{doi},#{schoolOrder},#{authorOrder},#{isOne}, #{oneNum},#{partition},
+                #{journal},#{passageDate},#{passageUrl},#{passageUrl2},#{passageGrade})
     </insert>
 
     <delete id="deleteById" parameterType="java.lang.Long">
@@ -49,7 +49,7 @@
                 one_num = #{oneNum},
             </if>
             <if test="partition!=null">
-                partition = #{partition},
+                `partition` = #{partition},
             </if>
             <if test="journal!=null and journal!=''">
                 journal = #{journal},

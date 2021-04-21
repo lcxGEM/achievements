@@ -18,7 +18,7 @@ public class GradePatent {
 
     private String patentName;
 
-    private Integer nature;//专利性质
+    private Integer nature;//专利性质 1 国际专利 2 发明专利
 
     private String patentNum;
 

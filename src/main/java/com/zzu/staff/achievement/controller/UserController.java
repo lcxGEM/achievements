@@ -1,7 +1,12 @@
 package com.zzu.staff.achievement.controller;
 
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.zzu.staff.achievement.entity.IndexPrizeTypeParam;
 import com.zzu.staff.achievement.entity.User;
+import com.zzu.staff.achievement.entity.UserParam;
 import com.zzu.staff.achievement.service.IUserService;
+import org.apache.ibatis.annotations.Param;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,6 +22,21 @@ public class UserController {
     @GetMapping("queryAll")
     public List<User> queryAll(){
         return userService.queryAll();
+    }
+
+    @GetMapping("queryAllParam/{pageNum}/{pageSize}/{year}/{cate}/{sName}/{sTel}/{sId}/{sDepart}")
+    public PageInfo<UserParam> queryParam(@PathVariable("pageNum")Integer pageNum,
+                                          @PathVariable("pageSize") Integer pageSize,
+                                          @PathVariable("year")Integer year,
+                                          @PathVariable("cate")Integer category,
+                                          @PathVariable("sName") String sName,
+                                          @PathVariable("sTel") String sTel,
+                                          @PathVariable("sId") String sId,
+                                          @PathVariable("sDepart") Integer sDepart){
+        PageHelper.startPage(pageNum, pageSize);
+        List<UserParam> userParams = userService.queryAllParam(year, category, sName, sTel, sId, sDepart);
+        PageInfo<UserParam> pageInfo = new PageInfo<>(userParams);
+        return pageInfo;
     }
 
     @GetMapping("queryByDepartment/{id}")

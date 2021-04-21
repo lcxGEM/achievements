@@ -5,8 +5,10 @@
         select * from grade_prize
     </select>
 
-    <select id="queryByGradeId" parameterType="java.lang.Long" resultType="com.zzu.staff.achievement.entity.GradePrize">
-        select * from grade_prize where grade_id = #{id}
+    <select id="queryByGradeId" parameterType="java.lang.Long" resultType="com.zzu.staff.achievement.entity.GradePrizeParam">
+        select *
+        from grade_prize,index_prize_level,index_prize_type
+        where grade_id = #{id} and prize_type = index_prize_type.prize_type_id and prize_level = prize_level_id
     </select>
 
     <select id="queryById" parameterType="java.lang.Long" resultType="com.zzu.staff.achievement.entity.GradePrize">

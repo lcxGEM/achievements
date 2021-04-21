@@ -15,9 +15,9 @@ public interface IUserGradeService {
 
     int deleteById(long id);
 
-    int insert(Map<String,Object> index);
+    int insert(UserGrade userGrade);
 
-    int update(Map<String,Object> index);
+    Long insertA(UserGrade userGrade);
 
     int update(UserGrade userGrade);
 }

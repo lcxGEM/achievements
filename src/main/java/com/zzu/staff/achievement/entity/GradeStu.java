@@ -17,7 +17,7 @@ public class GradeStu {
 
     private Long gradeId;
 
-    private Integer education;
+    private Integer education; //1博士生 2博士后
 
     private String stuName;
 

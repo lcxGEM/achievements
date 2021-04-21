@@ -1,7 +1,6 @@
 package com.zzu.staff.achievement.mapper;
 
 import com.zzu.staff.achievement.entity.GradeTalent;
-import com.zzu.staff.achievement.entity.IndexTalent;
 import org.apache.ibatis.annotations.Mapper;
 import org.springframework.stereotype.Repository;
 

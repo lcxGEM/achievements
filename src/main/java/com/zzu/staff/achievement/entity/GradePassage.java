@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.util.Date;
+import java.util.Objects;
 
 /**
  * 论文
@@ -31,15 +32,30 @@ public class GradePassage {
 
     private Boolean isOne;
 
-    private Boolean oneNum;
+    private Integer oneNum;
 
     private Integer partition;
 
     private String journal;//期刊
 
-    private Date passageDate;
+    private String passageDate;
 
     private String passageUrl;
 
+    private String passageUrl2;
+
     private Float passageGrade;
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof GradePassage)) return false;
+        GradePassage passage = (GradePassage) o;
+        return getPassageId().equals(passage.getPassageId());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getPassageId());
+    }
 }

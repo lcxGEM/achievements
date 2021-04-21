@@ -24,7 +24,7 @@ public class GradePrize {
 
     private Integer prizeLevel;
 
-    private Date prizeDate;
+    private String prizeDate;
 
     private Integer prizeSchoolOrder;
 

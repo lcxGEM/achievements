@@ -10,22 +10,25 @@
     </select>
 
     <insert id="insert" parameterType="com.zzu.staff.achievement.entity.GradeTalent">
-        insert into grade_talent (grade_id, talent_id,grade_url)
-        values (#{gradeId},#{talentId},#{gradeUrl})
+        insert into grade_talent (grade_id, talent_id,grade_url,talent_grade)
+        values (#{gradeId},#{talentId},#{gradeUrl},#{talentGrade})
     </insert>
 
     <delete id="deleteById" parameterType="java.lang.Long">
         delete from grade_talent where grade_id = #{id}
     </delete>
 
-    <update id="update" parameterType="com.zzu.staff.achievement.entity.User">
+    <update id="update" parameterType="com.zzu.staff.achievement.entity.GradeTalent">
         update grade_talent
         <trim prefix="set" suffixOverrides=",">
-            <if test="userName!=null">
+            <if test="talentId!=null">
                 talent_id = #{talentId},
             </if>
             <if test="gradeUrl!=null and gradeUrl!=''">
                 grade_url = #{gradeUrl},
+            </if>
+            <if test="talentGrade!=null">
+                talent_grade = #{talentGrade}
             </if>
         </trim>
         where grade_id = #{gradeId}

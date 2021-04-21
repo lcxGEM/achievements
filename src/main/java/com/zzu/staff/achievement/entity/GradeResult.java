@@ -21,4 +21,6 @@ public class GradeResult {
     private Float resultNum;
 
     private Float resultGrade;
+
+    private String resultUrl;
 }
