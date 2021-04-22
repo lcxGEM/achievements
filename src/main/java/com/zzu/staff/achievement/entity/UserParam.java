@@ -31,6 +31,8 @@ public class UserParam {
 
     private BigDecimal  gradeId;
 
+    private Integer year; //以2020年为基础，每年加一；根据年份区分不同成绩值，详细信息绑定gradeID
+
     private Float stu;
 
     private Float talent;

@@ -21,4 +21,6 @@ public interface GradePatentMapper {
     int update(GradePatent gradePatent);
 
     int deleteById(long id);
+
+    int deleteByGradeId(long id);
 }

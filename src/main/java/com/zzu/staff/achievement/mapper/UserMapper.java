@@ -38,4 +38,12 @@ public interface UserMapper {
     int update(User user);
 
     int deleteById(long id);
+
+    User queryByTel(String tel);
+
+    int changePasswd(String id, String passwd);
+
+    List<UserParam> queryUserParam(String tel);
+
+    User queryByIdCard(String idcard);
 }

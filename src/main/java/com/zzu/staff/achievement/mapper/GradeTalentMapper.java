@@ -19,4 +19,6 @@ public interface GradeTalentMapper {
     int update(GradeTalent gradeTalent);
 
     int deleteById(long id);
+
+    int deleteByGradeId(long id);
 }

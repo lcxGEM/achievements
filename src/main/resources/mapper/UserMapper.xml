@@ -6,8 +6,20 @@
         select * from user
     </select>
 
+    <select id="queryByTel" resultType="com.zzu.staff.achievement.entity.User">
+        select * from user where phone_number = #{tel}
+    </select>
+
     <select id="queryByDepartment" parameterType="java.lang.Integer" resultType="com.zzu.staff.achievement.entity.User">
         select * from user where department_id = #{id}
+    </select>
+
+    <select id="queryByIdCard" resultType="com.zzu.staff.achievement.entity.User">
+        select * from user where idcard = #{idcard}
+    </select>
+
+    <select id="queryUserParam" resultType="com.zzu.staff.achievement.entity.UserParam">
+        select * from user,user_grade where user_id = u_id and phone_number = #{tel}
     </select>
 
     <select id="queryAllParam" resultType="com.zzu.staff.achievement.entity.UserParam">
@@ -19,7 +31,7 @@
     </select>
     
     <select id="queryAllParamByParam" resultType="com.zzu.staff.achievement.entity.UserParam">
-        select * from user,user_grade,department where user_id = u_id and year = #{year} and user.department_id = department.department_id and department_id = #{sDepart}
+        select * from user,user_grade,department where user_id = u_id and year = #{year} and user.department_id = department.department_id and department.department_id = #{sDepart}
         <if test="sName!=''">and user.user_name like CONCAT('%',#{sName},'%')</if>
         <if test="sTel!=''">and user.phone_number like CONCAT('%',#{sTel},'%')</if>
         <if test="sId!=''">and user.idcard like CONCAT('%',#{sId},'%')</if>
@@ -47,6 +59,10 @@
     <delete id="deleteById" parameterType="java.lang.Long">
         delete from user where user_id = #{id}
     </delete>
+
+    <update id="changePasswd">
+        update user set passwd = #{passwd} where phone_number = #{id}
+    </update>
 
     <update id="update" parameterType="com.zzu.staff.achievement.entity.User">
         update user

@@ -21,4 +21,6 @@ public interface GradeResultMapper {
     int update(GradeResult gradeResult);
 
     int deleteById(long id);
+
+    int deleteByGradeId(long id);
 }

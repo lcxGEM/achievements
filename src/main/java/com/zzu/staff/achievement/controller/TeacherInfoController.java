@@ -5,6 +5,7 @@ import com.zzu.staff.achievement.config.FtpConfig;
 import com.zzu.staff.achievement.config.UploadReturn;
 import com.zzu.staff.achievement.entity.*;
 import com.zzu.staff.achievement.service.*;
+import com.zzu.staff.achievement.util.FtpUtil;
 import com.zzu.staff.achievement.util.HandlerDataUtil;
 import com.zzu.staff.achievement.util.UploadUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -75,9 +76,20 @@ public class TeacherInfoController {
         //创建user                之后需要创建一个userGrade空表，里面只有uId和id
         User userParam = HandlerDataUtil.handlerUser(user);
         int flag = userParam.getPeopleCategory();
-        long s = userService.insertA(userParam);//返回user的值。之后要使用
+        //user判断是否存在
+        User passUser = userService.queryByIdCard(userParam.getIdcard());
+        long s;
+        if(passUser!=null){
+            s = passUser.getUserId();
+        }else{
+            s = userService.insertA(userParam);//返回user的值。之后要使用
+        }
         if(s==-1){
             return -1;
+        }
+        UserGrade sUserGrade = userGradeService.queryByUIdAndYear(s,YEAR);
+        if(sUserGrade!=null){
+            return -5;
         }
         //创建userGrade           添加到数据库之后返回id
         UserGrade userGrad = new UserGrade(null,s,YEAR,null,
@@ -203,8 +215,8 @@ public class TeacherInfoController {
         FtpConfig config = new FtpConfig();
         String oldName = file.getOriginalFilename();
         String picName = UploadUtil.generateRandonFileName(oldName);
-        // String url = FtpUtil.pictureUploadByConfig(config,picName,"grand",file.getInputStream());
-        // System.out.println(url);
-        return new UploadReturn("http://47.96.2.117:8449/imgserver/5188aac5-c093-4616-90be-b1826e8a832f.jpeg",1);
+        String url = FtpUtil.pictureUploadByConfig(config,picName,"grand",file.getInputStream());
+        System.out.println(url);
+        return new UploadReturn(url,1);
     }
 }

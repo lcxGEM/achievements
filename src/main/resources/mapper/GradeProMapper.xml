@@ -22,6 +22,10 @@
         delete from grade_pro where program_id = #{id}
     </delete>
 
+    <delete id="deleteByGradeId" parameterType="java.lang.Long">
+        delete from grade_pro where grade_id = #{id}
+    </delete>
+
     <update id="update" parameterType="com.zzu.staff.achievement.entity.GradePro">
         update grade_pro
         <trim prefix="set" suffixOverrides=",">

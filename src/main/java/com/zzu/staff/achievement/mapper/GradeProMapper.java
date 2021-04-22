@@ -22,4 +22,6 @@ public interface GradeProMapper {
     int update(GradePro gradePro);
 
     int deleteById(long id);
+
+    int deleteByGradeId(long id);
 }

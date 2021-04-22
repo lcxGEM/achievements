@@ -24,6 +24,11 @@ public class UserController {
         return userService.queryAll();
     }
 
+    @GetMapping("doLogin/{tel}/{passwd}")
+    public User doLogin(@PathVariable("tel")String tel,@PathVariable("passwd")String passwd){
+        return userService.doLogin(tel,passwd);
+    }
+
     @GetMapping("queryAllParam/{pageNum}/{pageSize}/{year}/{cate}/{sName}/{sTel}/{sId}/{sDepart}")
     public PageInfo<UserParam> queryParam(@PathVariable("pageNum")Integer pageNum,
                                           @PathVariable("pageSize") Integer pageSize,
@@ -37,6 +42,11 @@ public class UserController {
         List<UserParam> userParams = userService.queryAllParam(year, category, sName, sTel, sId, sDepart);
         PageInfo<UserParam> pageInfo = new PageInfo<>(userParams);
         return pageInfo;
+    }
+
+    @GetMapping("queryUserParam/{tel}")
+    public List<UserParam> queryUserParam(@PathVariable("tel")String tel){
+        return userService.queryUserParam(tel);
     }
 
     @GetMapping("queryByDepartment/{id}")
@@ -62,5 +72,10 @@ public class UserController {
     @GetMapping("deleteById/{id}")
     public int deleteById(@PathVariable("id")Long id){
         return userService.deleteById(id);
+    }
+
+    @GetMapping("/changePasswd/{id}/{passwd}")
+    public int changePasswd(@PathVariable("id")String id,@PathVariable("passwd")String passwd){
+        return userService.changePasswd(id,passwd);
     }
 }

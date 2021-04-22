@@ -23,4 +23,6 @@ public interface GradePrizeMapper {
     int update(GradePrize gradePrize);
 
     int deleteById(long id);
+
+    int deleteByGradeId(long id);
 }
