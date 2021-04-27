@@ -47,6 +47,10 @@ public class UserParam {
 
     private Float result;
 
+    private Float compositeIndex;
+
+    private Integer status;
+
     public String getPeopleCategory() {
         if(peopleCategory==1){
             return "校内在职";

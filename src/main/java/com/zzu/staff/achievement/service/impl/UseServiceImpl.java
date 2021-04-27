@@ -49,14 +49,14 @@ public class UseServiceImpl implements IUserService {
     }
 
     @Override
-    public List<UserParam> queryAllParam(int year,int category, String sName, String sTel, String sId, int sDepart) {
+    public List<UserParam> queryAllParam(int year,int category, String sName, String sTel, String sId, int sDepart,int status) {
         sName = sName.trim();
         sTel = sTel.trim();
         sId = sId.trim();
         if(sDepart<1){
-            return userMapper.queryAllParam(year,category,sName,sTel,sId);
+            return userMapper.queryAllParam(year,category,sName,sTel,sId,status);
         }else {
-            return userMapper.queryAllParamByParam(year,category,sName,sTel,sId,sDepart);
+            return userMapper.queryAllParamByParam(year,category,sName,sTel,sId,sDepart,status);
         }
     }
 

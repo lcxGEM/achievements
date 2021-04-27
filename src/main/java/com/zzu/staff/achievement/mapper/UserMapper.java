@@ -19,14 +19,16 @@ public interface UserMapper {
                                   @Param("category") int category,
                                   @Param("sName") String sName,
                                   @Param("sTel") String sTel,
-                                  @Param("sId") String sId);
+                                  @Param("sId") String sId,
+                                  @Param("status")int status);
 
     List<UserParam> queryAllParamByParam(@Param("year") int year,
                                          @Param("category") int category,
                                          @Param("sName") String sName,
                                          @Param("sTel") String sTel,
                                          @Param("sId") String sId,
-                                         @Param("sDepart") int sDepart);
+                                         @Param("sDepart") int sDepart,
+                                         @Param("status")int status);
     List<User> queryByDepartment(int id);
 
     User queryById(long id);

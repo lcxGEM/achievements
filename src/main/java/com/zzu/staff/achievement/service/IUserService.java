@@ -9,7 +9,7 @@ public interface IUserService {
 
     List<User> queryAll();
 
-    List<UserParam> queryAllParam(int year,int category,String sName,String sTel,String sId,int sDepart);
+    List<UserParam> queryAllParam(int year,int category,String sName,String sTel,String sId,int sDepart,int status);
 
     List<User> queryByDepartment(int id);
 

@@ -23,12 +23,18 @@ public class UploadUtil {
 
     /**
      * 获得随机UUID文件名
-     * @param fileName
+     *
+     * @param oldName
+     * @param type
+     * @param user
+     * @param name
+     * @param YEAR
      * @return
      */
-    public static String generateRandonFileName(String fileName) {
+    public static String generateRandonFileName(String oldName, int type, String user, String name, int YEAR) {
         // 首相获得扩展名，然后生成一个UUID码作为名称，然后加上扩展名
-        String ext = fileName.substring(fileName.lastIndexOf("."));
-        return UUID.randomUUID().toString() + ext;
+        String ext = oldName.substring(oldName.lastIndexOf("."));
+        String newName = user+"_"+name+"_"+type+"_"+YEAR;
+        return newName + ext;
     }
 }

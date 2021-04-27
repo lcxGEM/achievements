@@ -12,10 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
@@ -93,7 +90,7 @@ public class TeacherInfoController {
         }
         //创建userGrade           添加到数据库之后返回id
         UserGrade userGrad = new UserGrade(null,s,YEAR,null,
-                null,null, null,null,null,null,null);
+                null,null, null,null,null,null,null,1);
         long userGrade = userGradeService.insertA(userGrad);
         if(userGrade==-1){
             return -1;
@@ -205,16 +202,16 @@ public class TeacherInfoController {
         float sum = sumStu+ nTalent.getTalentGrade()+sumPass+sumPro+sumPrize+sumPatent+sumResult;
 
         UserGrade sumGrade = new UserGrade(userGrad.getGradeId(), s, YEAR,sumStu,
-                nTalent.getTalentGrade(),sumPass,sumPro,sumPrize,sumPatent,sumResult,sum);
+                nTalent.getTalentGrade(),sumPass,sumPro,sumPrize,sumPatent,sumResult,sum,1);
         System.out.println("----更新后的绩效--->"+sumGrade.toString());
         return userGradeService.update(sumGrade);
     }
 
     @PostMapping("uploadFile")
-    public UploadReturn uploadFile(MultipartFile file) throws IOException {
+    public UploadReturn uploadFile(MultipartFile file,Integer type,String user,String name) throws IOException {
         FtpConfig config = new FtpConfig();
         String oldName = file.getOriginalFilename();
-        String picName = UploadUtil.generateRandonFileName(oldName);
+        String picName = UploadUtil.generateRandonFileName(oldName,type,user,name,YEAR);
         String url = FtpUtil.pictureUploadByConfig(config,picName,"grand",file.getInputStream());
         System.out.println(url);
         return new UploadReturn(url,1);

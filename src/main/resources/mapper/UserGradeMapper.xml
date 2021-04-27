@@ -62,6 +62,9 @@
             <if test="sum!=null and sum!=''">
                 sum = #{sum},
             </if>
+            <if test="status &gt;=0">
+                `status` = #{status}
+            </if>
         </trim>
         where grade_id = #{gradeId}
     </update>

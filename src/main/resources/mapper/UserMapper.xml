@@ -23,18 +23,29 @@
     </select>
 
     <select id="queryAllParam" resultType="com.zzu.staff.achievement.entity.UserParam">
-        select * from user,user_grade,department where user_id = u_id and year = #{year} and user.department_id = department.department_id
-        <if test="sName!=''">and user.user_name like CONCAT('%',#{sName},'%')</if>
-        <if test="sTel!=''">and user.phone_number like CONCAT('%',#{sTel},'%')</if>
-        <if test="sId!=''">and user.idcard like CONCAT('%',#{sId},'%')</if>
+        select a.*,staff.composite_index
+        from
+        (select `user`.*,user_grade.*,department_name from user,user_grade,department
+        where user_id = u_id and user.department_id = department.department_id) as a
+        left join staff on identity = a.idcard
+        where  a.year = #{year}
+        <if test="status &gt; 0"> and a.status = #{status}</if>
+        <if test="sName!=''">and a.user_name like CONCAT('%',#{sName},'%')</if>
+        <if test="sTel!=''">and a.phone_number like CONCAT('%',#{sTel},'%')</if>
+        <if test="sId!=''">and a.idcard like CONCAT('%',#{sId},'%')</if>
         <if test="category gt 0">and people_category = #{category}</if>
     </select>
     
     <select id="queryAllParamByParam" resultType="com.zzu.staff.achievement.entity.UserParam">
-        select * from user,user_grade,department where user_id = u_id and year = #{year} and user.department_id = department.department_id and department.department_id = #{sDepart}
-        <if test="sName!=''">and user.user_name like CONCAT('%',#{sName},'%')</if>
-        <if test="sTel!=''">and user.phone_number like CONCAT('%',#{sTel},'%')</if>
-        <if test="sId!=''">and user.idcard like CONCAT('%',#{sId},'%')</if>
+        select a.*,staff.composite_index
+        from
+        (select `user`.*,user_grade.*,department_name from user,user_grade,department
+        where user_id = u_id and user.department_id = department.department_id and year = #{year}) as a
+        left join staff on identity = a.idcard where a.department_id = #{sDepart}
+        <if test="status gt 0">and a.status = #{status}</if>
+        <if test="sName!=''">and a.user_name like CONCAT('%',#{sName},'%')</if>
+        <if test="sTel!=''">and a.phone_number like CONCAT('%',#{sTel},'%')</if>
+        <if test="sId!=''">and a.idcard like CONCAT('%',#{sId},'%')</if>
         <if test="category gt 0">and people_category = #{category}</if>
     </select>
 

@@ -62,6 +62,7 @@ public class FtpUtil {
             ftp.setFileType(FTP.BINARY_FILE_TYPE);
             //ftp.enterLocalPassiveMode();// 这个设置允许被动连接--访问远程ftp时需要
             // 上传文件
+            filename=new String(filename.getBytes("GBK"),"iso-8859-1");
             if (!ftp.storeFile(filename, input)) {
                 return result;
             }
