@@ -1,5 +1,6 @@
 package com.zzu.staff.achievement.service.impl;
 
+import com.zzu.staff.achievement.entity.IndexNation;
 import com.zzu.staff.achievement.entity.User;
 import com.zzu.staff.achievement.entity.UserGrade;
 import com.zzu.staff.achievement.entity.UserParam;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Calendar;
 import java.util.List;
 
 @Service
@@ -42,6 +44,9 @@ public class UseServiceImpl implements IUserService {
 
     @Autowired
     private GradeTalentMapper talentMapper;
+
+    @Autowired
+    private IndexNationMapper nationMapper;
 
     @Override
     public List<User> queryAll() {
@@ -88,6 +93,16 @@ public class UseServiceImpl implements IUserService {
 
     @Override
     public int update(User user) {
+        UserGrade userGrade = gradeMapper.queryByUIdAndYear(user.getUserId(), Calendar.getInstance().get(Calendar.YEAR));
+        float sum  = userGrade.getSum();
+        IndexNation nation = nationMapper.queryById(user.getNation());
+
+        if(sum>nation.getNationLevel()){
+            userGrade.setIndexSum((float)nation.getNationCode());
+        }else{
+            userGrade.setIndexSum(sum/nation.getNationLevel()*nation.getNationCode());
+        }
+        gradeMapper.update(userGrade);
         return userMapper.update(user);
     }
 

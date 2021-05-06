@@ -4,6 +4,8 @@ import com.zzu.staff.achievement.config.FtpConfig;
 import org.apache.commons.net.ftp.FTP;
 import org.apache.commons.net.ftp.FTPClient;
 import org.apache.commons.net.ftp.FTPReply;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -21,7 +23,7 @@ public class FtpUtil {
         picHttpPath = ftpConfig.getFTP_BASE_URL() + picNewName;
         return picHttpPath;
     }
-
+    private static final Logger logger = LoggerFactory.getLogger(WebLogAspect.class);
     /**
      * Description: 向FTP服务器上传文件
      *
@@ -50,20 +52,21 @@ public class FtpUtil {
             int reply;
             ftp.connect(host);// 连接FTP服务器
             // 如果采用默认端口，可以使用ftp.connect(host)的方式直接连接FTP服务器
-            System.out.println(ftp.login(username, password));
+            ftp.login(username, password);
             reply = ftp.getReplyCode();
             if (!FTPReply.isPositiveCompletion(reply)) {
                 ftp.disconnect();
+                logger.info("isPositiveCompletion出问题");
                 return result;
             }
             // 切换到上传目录
             ftp.changeWorkingDirectory(basePath);
             // 设置上传文件的类型为二进制类型
             ftp.setFileType(FTP.BINARY_FILE_TYPE);
-            //ftp.enterLocalPassiveMode();// 这个设置允许被动连接--访问远程ftp时需要
+            ftp.enterLocalPassiveMode();// 这个设置允许被动连接--访问远程ftp时需要
             // 上传文件
-            filename=new String(filename.getBytes("GBK"),"iso-8859-1");
             if (!ftp.storeFile(filename, input)) {
+                logger.info("保存文件出问题");
                 return result;
             }
             input.close();

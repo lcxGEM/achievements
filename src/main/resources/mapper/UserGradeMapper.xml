@@ -19,15 +19,15 @@
     </select>
 
     <insert id="insert" parameterType="com.zzu.staff.achievement.entity.UserGrade">
-        insert into user_grade (grade_id,u_id, year, stu, talent, passage, program, prize, patent, result,sum)
+        insert into user_grade (grade_id,u_id, year, stu, talent, passage, program, prize, patent, result,sum,index_sum)
         values (#{gradeId},#{uId},#{year},#{stu},#{talent},#{passage},#{program},
-                #{prize},#{patent},#{result},#{sum})
+                #{prize},#{patent},#{result},#{sum},#{indexSum})
     </insert>
 
     <insert id="insertA" parameterType="com.zzu.staff.achievement.entity.UserGrade">
-        insert into user_grade (grade_id,u_id, year, stu, talent, passage, program, prize, patent, result,sum)
+        insert into user_grade (grade_id,u_id, year, stu, talent, passage, program, prize, patent, result,sum,index_sum)
         values (#{gradeId},#{uId},#{year},#{stu},#{talent},#{passage},#{program},
-                #{prize},#{patent},#{result},#{sum})
+                #{prize},#{patent},#{result},#{sum},#{indexSum})
     </insert>
 
 
@@ -63,7 +63,10 @@
                 sum = #{sum},
             </if>
             <if test="status &gt;=0">
-                `status` = #{status}
+                `status` = #{status},
+            </if>
+            <if test="indexSum &gt;=0">
+                index_sum = #{indexSum},
             </if>
         </trim>
         where grade_id = #{gradeId}

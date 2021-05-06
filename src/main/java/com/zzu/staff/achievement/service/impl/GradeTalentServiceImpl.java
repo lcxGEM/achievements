@@ -1,11 +1,7 @@
 package com.zzu.staff.achievement.service.impl;
 
-import com.zzu.staff.achievement.entity.GradeTalent;
-import com.zzu.staff.achievement.entity.IndexTalent;
-import com.zzu.staff.achievement.entity.UserGrade;
-import com.zzu.staff.achievement.mapper.GradeTalentMapper;
-import com.zzu.staff.achievement.mapper.IndexTalentMapper;
-import com.zzu.staff.achievement.mapper.UserGradeMapper;
+import com.zzu.staff.achievement.entity.*;
+import com.zzu.staff.achievement.mapper.*;
 import com.zzu.staff.achievement.service.IGradeTalentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,6 +19,12 @@ public class GradeTalentServiceImpl implements IGradeTalentService {
 
     @Autowired
     private UserGradeMapper gradeMapper;
+
+    @Autowired
+    private UserMapper userMapper;
+
+    @Autowired
+    private IndexNationMapper nationMapper;
 
     @Override
     public GradeTalent insert(GradeTalent talent) {
@@ -47,7 +49,19 @@ public class GradeTalentServiceImpl implements IGradeTalentService {
         float grade = getGrade(talent);
         talent.setTalentGrade(grade);
         UserGrade userGrade = gradeMapper.queryById(talent.getGradeId());
+
+        float sum = userGrade.getSum()-userGrade.getTalent()+grade;
         userGrade.setSum(userGrade.getSum()-userGrade.getTalent()+grade);
+
+
+        User user = userMapper.queryById(userGrade.getUId());
+        IndexNation nation = nationMapper.queryById(user.getNation());
+        if(sum>nation.getNationLevel()){
+            userGrade.setIndexSum((float)nation.getNationCode());
+        }else{
+            userGrade.setIndexSum(sum/ nation.getNationLevel()* nation.getNationCode());
+        }
+
         userGrade.setTalent(grade);
         if(gradeMapper.update(userGrade)==1){
             if(mapper.update(talent)==1){

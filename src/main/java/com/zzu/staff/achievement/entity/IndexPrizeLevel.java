@@ -11,7 +11,7 @@ public class IndexPrizeLevel {
 
     private Integer prizeLevelId;
 
-    private Integer prizeTypeId;
+    private Integer prizeTypeIds;
 
     private String prizeLevelName;
 

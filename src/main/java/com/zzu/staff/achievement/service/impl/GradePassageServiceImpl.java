@@ -1,9 +1,13 @@
 package com.zzu.staff.achievement.service.impl;
 
 import com.zzu.staff.achievement.entity.GradePassage;
+import com.zzu.staff.achievement.entity.IndexNation;
+import com.zzu.staff.achievement.entity.User;
 import com.zzu.staff.achievement.entity.UserGrade;
 import com.zzu.staff.achievement.mapper.GradePassageMapper;
+import com.zzu.staff.achievement.mapper.IndexNationMapper;
 import com.zzu.staff.achievement.mapper.UserGradeMapper;
+import com.zzu.staff.achievement.mapper.UserMapper;
 import com.zzu.staff.achievement.service.IGradePassageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -34,6 +38,12 @@ public class GradePassageServiceImpl implements IGradePassageService {
     @Autowired
     private UserGradeMapper gradeMapper;
 
+    @Autowired
+    private UserMapper userMapper;
+
+    @Autowired
+    private IndexNationMapper nationMapper;
+
     @Override
     public GradePassage insert(GradePassage passage) {
         float grade = getGrade(passage);
@@ -60,7 +70,16 @@ public class GradePassageServiceImpl implements IGradePassageService {
         //计算论文总分
         float sumPass = calculateSum(passageList,id);
         //总分计算完毕，更新userGrade
-        userGrade.setSum(userGrade.getSum()-userGrade.getPassage()+sumPass);
+        float sum = userGrade.getSum()-userGrade.getPassage()+sumPass;
+        userGrade.setSum(sum);
+
+        User user = userMapper.queryById(userGrade.getUId());
+        IndexNation nation = nationMapper.queryById(user.getNation());
+        if(sum>nation.getNationLevel()){
+            userGrade.setIndexSum((float)nation.getNationCode());
+        }else{
+            userGrade.setIndexSum(sum/ nation.getNationLevel()* nation.getNationCode());
+        }
         userGrade.setPassage(sumPass);
         if(gradeMapper.update(userGrade)==1) {
             if(mapper.deleteById(id)==1){
@@ -83,7 +102,17 @@ public class GradePassageServiceImpl implements IGradePassageService {
         passageList.add(passage);
         float sumPass = calculateSum(passageList,0l);
         //总分计算完毕，更新userGrade
-        userGrade.setSum(userGrade.getSum()-userGrade.getPassage()+sumPass);
+        float sum  = userGrade.getSum()-userGrade.getPassage()+sumPass;
+        userGrade.setSum(sum);
+
+        User user = userMapper.queryById(userGrade.getUId());
+        IndexNation nation = nationMapper.queryById(user.getNation());
+        if(sum>nation.getNationLevel()){
+            userGrade.setIndexSum((float)nation.getNationCode());
+        }else{
+            userGrade.setIndexSum(sum/ nation.getNationLevel()* nation.getNationCode());
+        }
+
         userGrade.setPassage(sumPass);
         if(gradeMapper.update(userGrade)==1) {
             if(mapper.insert(passage)==1){
@@ -106,8 +135,18 @@ public class GradePassageServiceImpl implements IGradePassageService {
         passageList.remove(passage);
         passageList.add(passage);
         float sumPass = calculateSum(passageList,0l);
-        userGrade.setSum(userGrade.getSum()-userGrade.getPassage()+sumPass);
+        float sum = userGrade.getSum()-userGrade.getPassage()+sumPass;
+        userGrade.setSum(sum);
         userGrade.setPassage(sumPass);
+
+        User user = userMapper.queryById(userGrade.getUId());
+        IndexNation nation = nationMapper.queryById(user.getNation());
+        if(sum>nation.getNationLevel()){
+            userGrade.setIndexSum((float)nation.getNationCode());
+        }else{
+            userGrade.setIndexSum(sum/ nation.getNationLevel()* nation.getNationCode());
+        }
+
         if(gradeMapper.update(userGrade)==1) {
             if(mapper.update(passage)==1){
                 return 1;

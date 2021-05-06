@@ -1,9 +1,13 @@
 package com.zzu.staff.achievement.service.impl;
 
 import com.zzu.staff.achievement.entity.GradePatent;
+import com.zzu.staff.achievement.entity.IndexNation;
+import com.zzu.staff.achievement.entity.User;
 import com.zzu.staff.achievement.entity.UserGrade;
 import com.zzu.staff.achievement.mapper.GradePatentMapper;
+import com.zzu.staff.achievement.mapper.IndexNationMapper;
 import com.zzu.staff.achievement.mapper.UserGradeMapper;
+import com.zzu.staff.achievement.mapper.UserMapper;
 import com.zzu.staff.achievement.service.IGradePatentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -28,6 +32,12 @@ public class GradePatentServiceImpl implements IGradePatentService {
     @Autowired
     private UserGradeMapper gradeMapper;
 
+    @Autowired
+    private UserMapper userMapper;
+
+    @Autowired
+    private IndexNationMapper nationMapper;
+
     @Override
     public GradePatent insert(GradePatent patent) {
         int grade = getGrade(patent);
@@ -51,7 +61,17 @@ public class GradePatentServiceImpl implements IGradePatentService {
         GradePatent gradePatent = mapper.queryById(id);
         UserGrade userGrade = gradeMapper.queryById(gradePatent.getGradeId());
         userGrade.setPatent(userGrade.getPatent()-gradePatent.getPatentGrade());
-        userGrade.setSum(userGrade.getSum()-gradePatent.getPatentGrade());
+        float sum = userGrade.getSum()-gradePatent.getPatentGrade();
+        userGrade.setSum(sum);
+
+        User user = userMapper.queryById(userGrade.getUId());
+        IndexNation nation = nationMapper.queryById(user.getNation());
+        if(sum>nation.getNationLevel()){
+            userGrade.setIndexSum((float)nation.getNationCode());
+        }else{
+            userGrade.setIndexSum(sum/ nation.getNationLevel()* nation.getNationCode());
+        }
+
         if(gradeMapper.update(userGrade)==1){
             if(mapper.deleteById(id)==1){
                 return 1;
@@ -71,7 +91,15 @@ public class GradePatentServiceImpl implements IGradePatentService {
         System.out.println("--->专利："+patent.toString());
         UserGrade userGrade = gradeMapper.queryById(patent.getGradeId());
         userGrade.setPatent(userGrade.getPatent()+patent.getPatentGrade());
-        userGrade.setSum(userGrade.getSum()+patent.getPatentGrade());
+        float sum = userGrade.getSum()+patent.getPatentGrade();
+        userGrade.setSum(sum);
+        User user = userMapper.queryById(userGrade.getUId());
+        IndexNation nation = nationMapper.queryById(user.getNation());
+        if(sum>nation.getNationLevel()){
+            userGrade.setIndexSum((float)nation.getNationCode());
+        }else{
+            userGrade.setIndexSum(sum/ nation.getNationLevel()* nation.getNationCode());
+        }
         if(gradeMapper.update(userGrade)==1){
             if(mapper.insert(patent)==1){
                 return 1;
@@ -92,7 +120,15 @@ public class GradePatentServiceImpl implements IGradePatentService {
         patent.setPatentGrade(grade);
         System.out.println("--->专利："+patent.toString());
         if(origin.getPatentGrade()!=grade){
-            userGrade.setSum(userGrade.getSum()-origin.getPatentGrade()+grade);
+            float sum = userGrade.getSum()-origin.getPatentGrade()+grade;
+            userGrade.setSum(sum);
+            User user = userMapper.queryById(userGrade.getUId());
+            IndexNation nation = nationMapper.queryById(user.getNation());
+            if(sum>nation.getNationLevel()){
+                userGrade.setIndexSum((float)nation.getNationCode());
+            }else{
+                userGrade.setIndexSum(sum/ nation.getNationLevel()* nation.getNationCode());
+            }
             userGrade.setPatent(userGrade.getPatent()-origin.getPatentGrade()+grade);
             if(gradeMapper.update(userGrade)!=1){
                 throw new Exception("grade更新出错！");

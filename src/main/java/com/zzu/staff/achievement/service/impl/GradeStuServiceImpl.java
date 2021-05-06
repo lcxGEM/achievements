@@ -1,10 +1,15 @@
 package com.zzu.staff.achievement.service.impl;
 
 import com.zzu.staff.achievement.entity.GradeStu;
+import com.zzu.staff.achievement.entity.IndexNation;
+import com.zzu.staff.achievement.entity.User;
 import com.zzu.staff.achievement.entity.UserGrade;
 import com.zzu.staff.achievement.mapper.GradeStuMapper;
+import com.zzu.staff.achievement.mapper.IndexNationMapper;
 import com.zzu.staff.achievement.mapper.UserGradeMapper;
+import com.zzu.staff.achievement.mapper.UserMapper;
 import com.zzu.staff.achievement.service.IGradeStuService;
+import com.zzu.staff.achievement.service.IndexNationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -37,6 +42,12 @@ public class GradeStuServiceImpl implements IGradeStuService{
     @Autowired
     private UserGradeMapper userGradeMapper;
 
+    @Autowired
+    private UserMapper userMapper;
+
+    @Autowired
+    private IndexNationMapper nationMapper;
+
     @Override
     public GradeStu insert(GradeStu stu) {
         float grade = getGrade(stu);
@@ -60,7 +71,17 @@ public class GradeStuServiceImpl implements IGradeStuService{
         GradeStu stu = mapper.queryById(id);
         UserGrade userGrade = userGradeMapper.queryById(stu.getGradeId());
         userGrade.setStu(userGrade.getStu()-stu.getStuGrade());
-        userGrade.setSum(userGrade.getSum()-stu.getStuGrade());
+        float sum = userGrade.getSum()-stu.getStuGrade();
+        userGrade.setSum(sum);
+
+        User user = userMapper.queryById(userGrade.getUId());
+        IndexNation nation = nationMapper.queryById(user.getNation());
+        if(sum>nation.getNationLevel()){
+            userGrade.setIndexSum((float)nation.getNationCode());
+        }else{
+            userGrade.setIndexSum(sum/ nation.getNationLevel()* nation.getNationCode());
+        }
+
         if(userGradeMapper.update(userGrade)==1) {
             return mapper.deleteById(id);
         }else{
@@ -77,7 +98,18 @@ public class GradeStuServiceImpl implements IGradeStuService{
         if(mapper.update(stu)==1){
             UserGrade grade = userGradeMapper.queryById(stu.getGradeId());
             grade.setStu(grade.getStu()+g-origin.getStuGrade());
-            grade.setSum(grade.getSum()+g-origin.getStuGrade());
+
+            float sum = grade.getSum()+g-origin.getStuGrade();
+            grade.setSum(sum);
+
+            User user = userMapper.queryById(grade.getUId());
+            IndexNation nation = nationMapper.queryById(user.getNation());
+            if(sum>nation.getNationLevel()){
+                grade.setIndexSum((float)nation.getNationCode());
+            }else{
+                grade.setIndexSum(sum/ nation.getNationLevel()* nation.getNationCode());
+            }
+
             if(userGradeMapper.update(grade)==1){
                 return 1;
             }else {
@@ -96,7 +128,17 @@ public class GradeStuServiceImpl implements IGradeStuService{
         if(mapper.insert(stu)==1){
             UserGrade grade = userGradeMapper.queryById(stu.getGradeId());
             grade.setStu(grade.getStu()+g);
-            grade.setSum(grade.getSum()+g);
+            float sum  = grade.getSum()+g;
+            grade.setSum(sum);
+
+            User user = userMapper.queryById(grade.getUId());
+            IndexNation nation = nationMapper.queryById(user.getNation());
+            if(sum>nation.getNationLevel()){
+                grade.setIndexSum((float)nation.getNationCode());
+            }else{
+                grade.setIndexSum(sum/ nation.getNationLevel()* nation.getNationCode());
+            }
+
             if(userGradeMapper.update(grade)==1){
                 return 1;
             }else {

@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzu.staff.achievement.mapper.IndexNationMapper">
+    <select id="queryAll" resultType="com.zzu.staff.achievement.entity.IndexNation">
+        select * from index_nation
+    </select>
+
+    <select id="queryById" parameterType="java.lang.Integer" resultType="com.zzu.staff.achievement.entity.IndexNation">
+        select * from index_nation where nation_id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.zzu.staff.achievement.entity.IndexNation">
+        insert into index_nation (nation_name, nation_code, nation_level)
+        values (#{nationName},#{nationCode},#{nationLevel})
+    </insert>
+
+    <delete id="deleteById" parameterType="java.lang.Integer">
+        delete from index_nation where nation_id = #{id}
+    </delete>
+
+    <update id="update" parameterType="com.zzu.staff.achievement.entity.IndexNation">
+        update index_nation
+        <trim prefix="set" suffixOverrides=",">
+            <if test="nationName!=null and nationName!=''">
+                nation_name = #{nationName},
+            </if>
+            <if test="nationCode!=null">
+                nation_code = #{nationCode},
+            </if>
+            <if test="nationLevel!=null">
+                nation_level = #{nationLevel},
+            </if>
+        </trim>
+        where nation_id = #{nationId}
+    </update>
+</mapper>

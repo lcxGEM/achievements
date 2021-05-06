@@ -23,7 +23,7 @@ public class User {
 
     private String politicsStatus; //政治面貌
 
-    private String nation; //民族
+    private Integer nation; //等级
 
     private String phoneNumber; //联系方式
 

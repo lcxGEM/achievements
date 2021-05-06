@@ -14,7 +14,7 @@ public class HandlerDataUtil {
         Integer people = new Integer((String) user.get("peopleCategory"));//1在职 2引进
         String nativePlace = (String) user.get("nativePlace");
         String politicsStatus = (String) user.get("politicsStatus");
-        String nation = (String) user.get("nation");
+        Integer nation = new Integer((String) user.get("nation"));
         String tel = (String) user.get("phoneNumber");
         String idCard = (String) user.get("idcard");
         Integer department = new Integer((String) user.get("departmentId"));

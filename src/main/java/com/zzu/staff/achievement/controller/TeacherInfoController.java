@@ -51,6 +51,9 @@ public class TeacherInfoController {
     @Autowired
     private IGradeResultService resultService;
 
+    @Autowired
+    private IndexNationService nationService;
+
     @Value("${passage.TOP}")
     private int TOP;
 
@@ -90,7 +93,7 @@ public class TeacherInfoController {
         }
         //创建userGrade           添加到数据库之后返回id
         UserGrade userGrad = new UserGrade(null,s,YEAR,null,
-                null,null, null,null,null,null,null,1);
+                null,null, null,null,null,null,null,1,null);
         long userGrade = userGradeService.insertA(userGrad);
         if(userGrade==-1){
             return -1;
@@ -200,9 +203,15 @@ public class TeacherInfoController {
             sumResult+=resultA.getResultGrade();
         }
         float sum = sumStu+ nTalent.getTalentGrade()+sumPass+sumPro+sumPrize+sumPatent+sumResult;
-
+        IndexNation nation =  nationService.queryById(userParam.getNation());
+        float indexSum;
+        if(sum>nation.getNationLevel()){
+            indexSum = nation.getNationCode();
+        }else{
+            indexSum = sum/nation.getNationLevel()* nation.getNationCode();
+        }
         UserGrade sumGrade = new UserGrade(userGrad.getGradeId(), s, YEAR,sumStu,
-                nTalent.getTalentGrade(),sumPass,sumPro,sumPrize,sumPatent,sumResult,sum,1);
+                nTalent.getTalentGrade(),sumPass,sumPro,sumPrize,sumPatent,sumResult,sum,1,indexSum);
         System.out.println("----更新后的绩效--->"+sumGrade.toString());
         return userGradeService.update(sumGrade);
     }

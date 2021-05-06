@@ -32,4 +32,6 @@ public class UserGrade {
     private Float sum;
 
     private Integer status;
+
+    private Float indexSum;
 }

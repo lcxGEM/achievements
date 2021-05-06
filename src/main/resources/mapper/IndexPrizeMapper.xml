@@ -1,12 +1,27 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.zzu.staff.achievement.mapper.IndexPrizeMapper">
+    <resultMap id="getAllType" type="com.zzu.staff.achievement.entity.IndexPrizeTypeParam">
+        <id property="prizeTypeId" column="prize_type_id" />
+        <result property="prizeTypeName" column="prize_type_name"></result>
+        <collection property="prizeLevels" ofType="com.zzu.staff.achievement.entity.IndexPrizeLevel">
+            <id property="prizeLevelId" column="prize_level_id"></id>
+            <result property="prizeTypeIds" column="prize_type_ids"></result>
+            <result property="prizeLevelName" column="prize_level_name"></result>
+            <result property="prizeLevelGrade" column="prize_level_grade"></result>
+        </collection>
+    </resultMap>
+
     <select id="queryAllType" resultType="com.zzu.staff.achievement.entity.IndexPrizeType">
         select * from index_prize_type
     </select>
 
+    <select id="queryAllParam" resultMap="getAllType">
+        select * from index_prize_type,index_prize_level where index_prize_level.prize_type_ids = index_prize_type.prize_type_id
+    </select>
+
     <select id="queryLevelByType" parameterType="java.lang.Integer" resultType="com.zzu.staff.achievement.entity.IndexPrizeLevel">
-        select * from index_prize_level where prize_type_id = #{id}
+        select * from index_prize_level where prize_type_ids = #{id}
     </select>
 
     <select id="queryTypeById" parameterType="java.lang.Integer" resultType="com.zzu.staff.achievement.entity.IndexPrizeType">
@@ -22,7 +37,7 @@
     </delete>
 
     <delete id="deleteLevelByType" parameterType="java.lang.Integer">
-        delete from index_prize_level where prize_type_id = #{id}
+        delete from index_prize_level where prize_type_ids = #{id}
     </delete>
 
     <delete id="deleteLevelById" parameterType="java.lang.Integer">
@@ -35,8 +50,8 @@
     </insert>
 
     <insert id="insertLevel" parameterType="com.zzu.staff.achievement.entity.IndexPrizeLevel">
-        insert into index_prize_level (prize_type_id, prize_level_name, prize_level_grade)
-        values (#{prizeTypeId},#{prizeLevelName},#{prizeLevelGrade})
+        insert into index_prize_level (prize_type_ids, prize_level_name, prize_level_grade)
+        values (#{prizeTypeIds},#{prizeLevelName},#{prizeLevelGrade})
     </insert>
 
     <update id="updateType" parameterType="com.zzu.staff.achievement.entity.IndexPrizeType">

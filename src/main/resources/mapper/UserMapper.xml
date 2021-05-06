@@ -19,14 +19,14 @@
     </select>
 
     <select id="queryUserParam" resultType="com.zzu.staff.achievement.entity.UserParam">
-        select * from user,user_grade where user_id = u_id and phone_number = #{tel}
+        select * from user,user_grade,index_nation where user_id = u_id and nation_id = nation and phone_number = #{tel}
     </select>
 
     <select id="queryAllParam" resultType="com.zzu.staff.achievement.entity.UserParam">
         select a.*,staff.composite_index
         from
-        (select `user`.*,user_grade.*,department_name from user,user_grade,department
-        where user_id = u_id and user.department_id = department.department_id) as a
+        (select `user`.*,user_grade.*,department_name,nation_name from user,user_grade,department,index_nation
+        where user_id = u_id and user.department_id = department.department_id and nation = nation_id) as a
         left join staff on identity = a.idcard
         where  a.year = #{year}
         <if test="status &gt; 0"> and a.status = #{status}</if>
@@ -39,8 +39,9 @@
     <select id="queryAllParamByParam" resultType="com.zzu.staff.achievement.entity.UserParam">
         select a.*,staff.composite_index
         from
-        (select `user`.*,user_grade.*,department_name from user,user_grade,department
-        where user_id = u_id and user.department_id = department.department_id and year = #{year}) as a
+        (select `user`.*,user_grade.*,department_name,nation_name from user,user_grade,department,index_nation
+        where user_id = u_id and nation = nation_id and user.department_id = department.department_id
+        and year = #{year}) as a
         left join staff on identity = a.idcard where a.department_id = #{sDepart}
         <if test="status gt 0">and a.status = #{status}</if>
         <if test="sName!=''">and a.user_name like CONCAT('%',#{sName},'%')</if>

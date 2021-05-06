@@ -19,6 +19,8 @@ public class UserParam {
 
     private Integer peopleCategory; //在职和引进
 
+    private String nationName; //岗位类别
+
     private String phoneNumber; //联系方式
 
     private String idcard;
@@ -48,6 +50,8 @@ public class UserParam {
     private Float result;
 
     private Float compositeIndex;
+
+    private Float indexSum;
 
     private Integer status;
 

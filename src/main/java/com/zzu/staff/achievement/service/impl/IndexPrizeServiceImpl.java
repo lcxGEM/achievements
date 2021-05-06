@@ -21,15 +21,7 @@ public class IndexPrizeServiceImpl implements IIndexPrizeService {
 
     @Override
     public List<IndexPrizeTypeParam> queryAllTypeParam() {
-        List<IndexPrizeType> list = mapper.queryAllType();
-        List<IndexPrizeTypeParam> result = new ArrayList<>();
-        for (IndexPrizeType type:list) {
-            List<IndexPrizeLevel> levels = mapper.queryLevelByType(type.getPrizeTypeId());
-             IndexPrizeTypeParam param = new IndexPrizeTypeParam(type.getPrizeTypeId(),
-                     type.getPrizeTypeName(), levels);
-             result.add(param);
-        }
-        return result;
+        return mapper.queryAllParam();
     }
 
     @Override

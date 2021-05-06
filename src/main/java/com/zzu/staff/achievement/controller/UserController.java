@@ -93,7 +93,7 @@ public class UserController {
     @GetMapping("changeStatus/{id}/{status}")
     public int changeStatus(@PathVariable("id")Long id,@PathVariable("status")Integer status){
         UserGrade grade = new UserGrade(id,null,null,null,null,null,null,
-                null,null,null,null,status);
+                null,null,null,null,status,null);
         return gradeService.update(grade);
     }
 
@@ -117,7 +117,8 @@ public class UserController {
 
         //新增数据行，并且设置单元格数据
         int rowNum = 1;
-        String[] headers = { "类别", "姓名", "身份证", "院系","指导博士(后)","人才项目","论文","科研项目","获奖情况","专利","成果转化","总分","学历总分","状态"};
+        String[] headers = {"岗位类别", "人员类别", "姓名", "身份证", "院系","指导博士(后)","人才项目","论文","科研项目","获奖情况","专利","成果转化",
+                "总分","换算总分","学历总分","状态"};
         //headers表示excel表中第一行的表头
         HSSFRow row = sheet.createRow(0);
         //在excel表中添加表头
@@ -130,20 +131,22 @@ public class UserController {
         //在表中存放查询到的数据放入对应的列
         for (UserParam param : userParams) {
             HSSFRow row1 = sheet.createRow(rowNum);
-            row1.createCell(0).setCellValue(param.getPeopleCategory());
-            row1.createCell(1).setCellValue(param.getUserName());
-            row1.createCell(2).setCellValue(param.getIdcard());
-            row1.createCell(3).setCellValue(param.getDepartmentName());
-            row1.createCell(4).setCellValue(param.getStu());
-            row1.createCell(5).setCellValue(param.getTalent());
-            row1.createCell(6).setCellValue(param.getPassage());
-            row1.createCell(7).setCellValue(param.getProgram());
-            row1.createCell(8).setCellValue(param.getPrize());
-            row1.createCell(9).setCellValue(param.getPatent());
-            row1.createCell(10).setCellValue(param.getResult());
-            row1.createCell(11).setCellValue(param.getSum());
-            row1.createCell(12).setCellValue(param.getCompositeIndex()==null?0:param.getCompositeIndex());
-            row1.createCell(13).setCellValue(getStatus(param.getStatus()));
+            row1.createCell(0).setCellValue(param.getNationName());
+            row1.createCell(1).setCellValue(param.getPeopleCategory());
+            row1.createCell(2).setCellValue(param.getUserName());
+            row1.createCell(3).setCellValue(param.getIdcard());
+            row1.createCell(4).setCellValue(param.getDepartmentName());
+            row1.createCell(5).setCellValue(param.getStu());
+            row1.createCell(6).setCellValue(param.getTalent());
+            row1.createCell(7).setCellValue(param.getPassage());
+            row1.createCell(8).setCellValue(param.getProgram());
+            row1.createCell(9).setCellValue(param.getPrize());
+            row1.createCell(10).setCellValue(param.getPatent());
+            row1.createCell(11).setCellValue(param.getResult());
+            row1.createCell(12).setCellValue(param.getSum());
+            row1.createCell(13).setCellValue(param.getIndexSum());
+            row1.createCell(14).setCellValue(param.getCompositeIndex()==null?0:param.getCompositeIndex());
+            row1.createCell(15).setCellValue(getStatus(param.getStatus()));
             rowNum++;
         }
         response.setContentType("application/octet-stream");

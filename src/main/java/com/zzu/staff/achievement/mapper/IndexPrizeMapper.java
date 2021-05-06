@@ -2,6 +2,7 @@ package com.zzu.staff.achievement.mapper;
 
 import com.zzu.staff.achievement.entity.IndexPrizeLevel;
 import com.zzu.staff.achievement.entity.IndexPrizeType;
+import com.zzu.staff.achievement.entity.IndexPrizeTypeParam;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -13,6 +14,8 @@ import java.util.List;
 public interface IndexPrizeMapper {
 
     List<IndexPrizeType> queryAllType();
+
+    List<IndexPrizeTypeParam> queryAllParam();
 
     List<IndexPrizeLevel> queryLevelByType(int typeId);
 
