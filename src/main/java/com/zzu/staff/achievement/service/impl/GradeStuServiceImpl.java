@@ -9,6 +9,7 @@ import com.zzu.staff.achievement.mapper.IndexNationMapper;
 import com.zzu.staff.achievement.mapper.UserGradeMapper;
 import com.zzu.staff.achievement.mapper.UserMapper;
 import com.zzu.staff.achievement.service.IGradeStuService;
+import com.zzu.staff.achievement.service.IUserGradeService;
 import com.zzu.staff.achievement.service.IndexNationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -16,8 +17,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * 指导博士，博士后
+ * 只有求是学人、求是学者 9、10才能操作
+ */
 @Service
 public class GradeStuServiceImpl implements IGradeStuService{
 
@@ -46,7 +52,7 @@ public class GradeStuServiceImpl implements IGradeStuService{
     private UserMapper userMapper;
 
     @Autowired
-    private IndexNationMapper nationMapper;
+    private IUserGradeService gradeService;
 
     @Override
     public GradeStu insert(GradeStu stu) {
@@ -62,90 +68,121 @@ public class GradeStuServiceImpl implements IGradeStuService{
 
     @Override
     public List<GradeStu> queryByGradeId(long id) {
-        return mapper.queryByGradeId(id);
+        UserGrade userGrade = userGradeMapper.queryById(id);//获取grade
+        User user = userMapper.queryById(userGrade.getUId());//获取user
+        if (user==null){
+            return null;
+        }
+        if(user.getNation()==9||user.getNation()==10){ //判断是否为求是学人、求是学者
+            return mapper.queryByGradeId(id);
+        }
+        return new ArrayList<>();
     }
-
+    //1.验证是否为求是学人
+    // 删除数据
+    // 计算总分
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
     public int deleteById(long id) throws Exception {
-        GradeStu stu = mapper.queryById(id);
-        UserGrade userGrade = userGradeMapper.queryById(stu.getGradeId());
-        userGrade.setStu(userGrade.getStu()-stu.getStuGrade());
-        float sum = userGrade.getSum()-stu.getStuGrade();
-        userGrade.setSum(sum);
-
-        User user = userMapper.queryById(userGrade.getUId());
-        IndexNation nation = nationMapper.queryById(user.getNation());
-        if(sum>nation.getNationLevel()){
-            userGrade.setIndexSum((float)nation.getNationCode());
-        }else{
-            userGrade.setIndexSum(sum/ nation.getNationLevel()* nation.getNationCode());
+        //验证身份
+        GradeStu stu = mapper.queryById(id);//要删除的数据
+        UserGrade userGrade = userGradeMapper.queryById(stu.getGradeId());//获取grade
+        if(userGrade.getStatus()==2||userGrade.getStatus()==1){//已提交待审核、审核通过两个状态不能随意编辑
+            return -3;
         }
-
-        if(userGradeMapper.update(userGrade)==1) {
-            return mapper.deleteById(id);
-        }else{
-            throw new Exception("更新总分出错！");
+        User user = userMapper.queryById(userGrade.getUId());//获取user
+        if (user==null){
+            return -1;
+        }
+        if(user.getNation()==9||user.getNation()==10){ //判断是否为求是学人、求是学者
+            //计算分数
+            userGrade.setStu(userGrade.getStu()-stu.getStuGrade());//减去单个数据
+            float sum = userGrade.getSum()-stu.getStuGrade();
+            userGrade.setSum(sum);//设置总分
+            //用service层的update，直接计算总分
+            if(gradeService.update(userGrade)==1) {
+                return mapper.deleteById(id);
+            }else{
+                throw new Exception("更新总分出错！");
+            }
+        }else{//不是没有操作
+            return -2;
         }
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
     public int update(GradeStu stu) throws Exception {
+        //验证身份
         GradeStu origin = mapper.queryById(stu.getStuGradeId());
-        float g = getGrade(stu);
-        stu.setStuGrade(g);
-        if(mapper.update(stu)==1){
-            UserGrade grade = userGradeMapper.queryById(stu.getGradeId());
-            grade.setStu(grade.getStu()+g-origin.getStuGrade());
+        UserGrade grade = userGradeMapper.queryById(stu.getGradeId());//获取
+        if(grade.getStatus()==2||grade.getStatus()==1){//已提交待审核、审核通过两个状态不能随意编辑
+            return -3;
+        }
 
-            float sum = grade.getSum()+g-origin.getStuGrade();
-            grade.setSum(sum);
-
-            User user = userMapper.queryById(grade.getUId());
-            IndexNation nation = nationMapper.queryById(user.getNation());
-            if(sum>nation.getNationLevel()){
-                grade.setIndexSum((float)nation.getNationCode());
-            }else{
-                grade.setIndexSum(sum/ nation.getNationLevel()* nation.getNationCode());
+        User user = userMapper.queryById(grade.getUId());
+        if (user==null){
+            return -1;
+        }
+        if(user.getNation()==9||user.getNation()==10) { //判断是否为求是学人、求是学者
+            float g = getGrade(stu);
+            stu.setStuGrade(g);
+            System.out.println("@@@@@@@@"+stu.toString());
+            if(stu.getEducation()==1){//博士生的话保证博新计划和博特计划为否
+                stu.setBoxin(false);
+                stu.setBote(false);
             }
-
-            if(userGradeMapper.update(grade)==1){
-                return 1;
-            }else {
-                throw new Exception( "userGrade更新失败！");
+            if (mapper.update(stu) == 1) {
+                grade.setStu(grade.getStu() + g - origin.getStuGrade());
+                float sum = grade.getSum() + g - origin.getStuGrade();
+                grade.setSum(sum);
+                if (gradeService.update(grade) == 1) {
+                    return 1;
+                } else {
+                    throw new Exception("userGrade更新失败！");
+                }
+            } else {
+                throw new Exception("数据添加失败");
             }
         }else{
-            throw new Exception("数据添加失败");
+            return -2;
         }
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
     public int insertS(GradeStu stu) throws Exception{
-        float g = getGrade(stu);
-        stu.setStuGrade(g);
-        if(mapper.insert(stu)==1){
-            UserGrade grade = userGradeMapper.queryById(stu.getGradeId());
-            grade.setStu(grade.getStu()+g);
-            float sum  = grade.getSum()+g;
-            grade.setSum(sum);
-
-            User user = userMapper.queryById(grade.getUId());
-            IndexNation nation = nationMapper.queryById(user.getNation());
-            if(sum>nation.getNationLevel()){
-                grade.setIndexSum((float)nation.getNationCode());
-            }else{
-                grade.setIndexSum(sum/ nation.getNationLevel()* nation.getNationCode());
+        //验证身份
+        UserGrade grade = userGradeMapper.queryById(stu.getGradeId());
+        if(grade.getStatus()==2||grade.getStatus()==1){//已提交待审核、审核通过两个状态不能随意编辑
+            return -3;
+        }
+        User user = userMapper.queryById(grade.getUId());
+        if(user==null){
+            return -1;
+        }
+        if(user.getNation()==9||user.getNation()==10) { //判断是否为求是学人、求是学者
+            float g = getGrade(stu);
+            stu.setStuGrade(g);
+            if(stu.getEducation()==1){//博士生的话保证博新计划和博特计划为否
+                stu.setBoxin(false);
+                stu.setBote(false);
             }
+            if (mapper.insert(stu) == 1) {
 
-            if(userGradeMapper.update(grade)==1){
-                return 1;
-            }else {
-                throw new Exception("userGrade更新失败！");
+                grade.setStu(grade.getStu() + g);
+                float sum = grade.getSum() + g;
+                grade.setSum(sum);
+                if (gradeService.update(grade) == 1) {
+                    return 1;
+                } else {
+                    throw new Exception("userGrade更新失败！");
+                }
+            } else {
+                throw new Exception("数据添加失败");
             }
         }else{
-            throw new Exception("数据添加失败");
+            return -2;//不需要操作此项
         }
     }
 

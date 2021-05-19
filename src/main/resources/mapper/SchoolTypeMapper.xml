@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzu.staff.achievement.mapper.SchoolTypeMapper">
+    <select id="queryAll" resultType="com.zzu.staff.achievement.entity.SchoolType">
+        select * from school_type
+    </select>
+
+    <select id="queryById" parameterType="java.lang.Integer" resultType="com.zzu.staff.achievement.entity.SchoolType">
+        select * from school_type where id = #{id}
+    </select>
+
+    <select id="queryByName" parameterType="java.lang.String" resultType="com.zzu.staff.achievement.entity.SchoolType">
+        select * from school_type where type_name = #{name}
+    </select>
+
+    <insert id="insert" parameterType="com.zzu.staff.achievement.entity.SchoolType">
+        insert into school_type (type_name, school_index, undergraduate_index, master_index, doctor_index,
+                                 aschool_index,aundergraduate_index,amaster_index,adoctor_index)
+        values(#{typeName},#{schoolIndex},#{undergraduateIndex},#{masterIndex},#{doctorIndex},
+               #{aschoolIndex},#{aundergraduateIndex},#{amasterIndex},#{adoctorIndex})
+    </insert>
+
+    <delete id="deleteById" parameterType="java.lang.Integer">
+        delete from school_type where id = #{id}
+    </delete>
+
+    <update id="update" parameterType="com.zzu.staff.achievement.entity.SchoolType">
+        update school_type set type_name = #{typeName},
+            school_index = #{schoolIndex},
+            undergraduate_index = #{undergraduateIndex},
+            master_index = #{masterIndex},
+            doctor_index = #{doctorIndex},
+            aschool_index = #{aschoolIndex},
+            aundergraduate_index = #{aundergraduateIndex},
+            amaster_index = #{amasterIndex},
+            adoctor_index = #{adoctorIndex}
+        where id = #{id}
+    </update>
+</mapper>

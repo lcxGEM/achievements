@@ -22,4 +22,8 @@ public class GradeTalentController {
         return service.update(talent);
     }
 
+    @PostMapping("insert")
+    public int insert(GradeTalent talent) throws Exception {
+        return service.insertA(talent);
+    }
 }

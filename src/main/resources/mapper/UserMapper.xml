@@ -2,56 +2,47 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.zzu.staff.achievement.mapper.UserMapper">
 
-    <select id="queryAll" resultType="com.zzu.staff.achievement.entity.User">
-        select * from user
-    </select>
-
-    <select id="queryByTel" resultType="com.zzu.staff.achievement.entity.User">
-        select * from user where phone_number = #{tel}
+    <select id="queryAll" resultType="com.zzu.staff.achievement.entity.UserVo">
+        select * from user left join department d on user.department_id = d.department_id
+            left join index_nation on nation = nation_id
+            left join politics on user.politics_status = politics_id
+        where user.department_id = d.department_id
+        <if test="name!=''">and user_name like CONCAT('%',#{name},'%')</if>
+        <if test="idCard!=''">and user.idcard like CONCAT('%',#{idCard},'%')</if>
+        <if test="nation &gt; 0">and nation = #{nation}</if>
+        <if test="category &gt; 0">and people_category = #{category}</if>
+        <if test="departId &gt; 0">and d.department_id = #{departId}</if>
     </select>
 
     <select id="queryByDepartment" parameterType="java.lang.Integer" resultType="com.zzu.staff.achievement.entity.User">
         select * from user where department_id = #{id}
     </select>
 
-    <select id="queryByIdCard" resultType="com.zzu.staff.achievement.entity.User">
-        select * from user where idcard = #{idcard}
+    <select id="queryById" parameterType="java.lang.Long" resultType="com.zzu.staff.achievement.entity.User">
+        select * from user where user_id = #{id}
+    </select>
+
+    <select id="queryByTel" resultType="com.zzu.staff.achievement.entity.User">
+        select * from user where phone_number = #{tel}
     </select>
 
     <select id="queryUserParam" resultType="com.zzu.staff.achievement.entity.UserParam">
-        select * from user,user_grade,index_nation where user_id = u_id and nation_id = nation and phone_number = #{tel}
+        select * from user,user_grade,index_nation
+        where user_id = u_id and nation_id = nation and user_id = #{id}
     </select>
 
-    <select id="queryAllParam" resultType="com.zzu.staff.achievement.entity.UserParam">
-        select a.*,staff.composite_index
-        from
-        (select `user`.*,user_grade.*,department_name,nation_name from user,user_grade,department,index_nation
-        where user_id = u_id and user.department_id = department.department_id and nation = nation_id) as a
-        left join staff on identity = a.idcard
-        where  a.year = #{year}
-        <if test="status &gt; 0"> and a.status = #{status}</if>
-        <if test="sName!=''">and a.user_name like CONCAT('%',#{sName},'%')</if>
-        <if test="sTel!=''">and a.phone_number like CONCAT('%',#{sTel},'%')</if>
-        <if test="sId!=''">and a.idcard like CONCAT('%',#{sId},'%')</if>
-        <if test="category gt 0">and people_category = #{category}</if>
-    </select>
-    
     <select id="queryAllParamByParam" resultType="com.zzu.staff.achievement.entity.UserParam">
-        select a.*,staff.composite_index
-        from
-        (select `user`.*,user_grade.*,department_name,nation_name from user,user_grade,department,index_nation
+        select `user`.*,user_grade.*,department_name,nation_name
+        from user,user_grade,department,index_nation
         where user_id = u_id and nation = nation_id and user.department_id = department.department_id
-        and year = #{year}) as a
-        left join staff on identity = a.idcard where a.department_id = #{sDepart}
-        <if test="status gt 0">and a.status = #{status}</if>
-        <if test="sName!=''">and a.user_name like CONCAT('%',#{sName},'%')</if>
-        <if test="sTel!=''">and a.phone_number like CONCAT('%',#{sTel},'%')</if>
-        <if test="sId!=''">and a.idcard like CONCAT('%',#{sId},'%')</if>
+        and year = #{year} and status >0
+        <if test="sDepart &gt; 0"> and department_id = #{sDepart} </if>
+        <if test="status gt 0">and status = #{status}</if>
+        <if test="sName!=''">and user_name like CONCAT('%',#{sName},'%')</if>
+        <if test="sTel!=''">and phone_number like CONCAT('%',#{sTel},'%')</if>
+        <if test="sId!=''">and idcard like CONCAT('%',#{sId},'%')</if>
         <if test="category gt 0">and people_category = #{category}</if>
-    </select>
-
-    <select id="queryById" parameterType="java.lang.Long" resultType="com.zzu.staff.achievement.entity.User">
-        select * from user where user_id = #{id}
+        order by res_sum desc
     </select>
 
     <insert id="insert" parameterType="com.zzu.staff.achievement.entity.User">
@@ -73,7 +64,7 @@
     </delete>
 
     <update id="changePasswd">
-        update user set passwd = #{passwd} where phone_number = #{id}
+        update user set passwd = #{passwd} where user_id = #{id}
     </update>
 
     <update id="update" parameterType="com.zzu.staff.achievement.entity.User">

@@ -13,7 +13,13 @@ public class IndexNation {
 
     private String nationName;
 
-    private Integer nationCode;  //换算的比例
+    private Float nationCode;  //换算的比例
 
-    private Integer nationLevel; //多少分达到这个指标
+    private Float nationLevel; //多少分达到这个指标
+
+    private Float compositeCode;
+
+    private Float compositeLevel;
+
+    private Float qualified;//合格分
 }

@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzu.staff.achievement.mapper.UserRecordMapper">
+    <!--开启mybatis二级缓存，开启后entity类要实现Serializable序列化接口-->
+    <select id="queryAll" resultType="com.zzu.staff.achievement.entity.UserRecord">
+        select * from user_record
+    </select>
+
+    <select id="queryRecordByUsId" resultType="com.zzu.staff.achievement.entity.UserRecord">
+        select * from user_record where us_id = #{id}
+    </select>
+
+    <select id="searchAllVo"  resultType="com.zzu.staff.achievement.entity.UserRecordVo">
+        select user_id,a2.record_id,a2.user_name,idcard,sex,phone_number,nation,nation_name,
+            undergraduate_school,uschoolname,master_school,mschoolname,doctor_school,
+            dschoolname,composite_index,evaluation,department_id,department_name from
+        (select user_id,user_record.record_id,user_name,idcard,sex,phone_number,nation,nation_name,user_record.undergraduate_school,
+            school.name as uschoolname,composite_index,evaluation,user.department_id,department_name
+            from user_record,school,department,user,school_type,index_nation
+            where user_record.undergraduate_school = school.id and user.department_id = department.department_id
+            and us_id = user_id and school.school_type = school_type.id and user.nation = index_nation.nation_id
+            <if test="teacherType gt 0"> and nation = #{teacherType}</if>
+            <if test="gsType gt 0">and school_type.id &lt;= #{gsType}</if>
+            <if test="depart gt 0">and department.department_id = #{depart}</if>
+            <if test="#{trim}!='' and #{trim}!=null">and user_name like CONCAT('%',#{trim},'%')</if>
+        ) as a2 left join
+        (select record_id,school.name as mschoolname,master_school
+            from user_record,school,school_type
+            where user_record.master_school = school.id and school_type.id = school.school_type
+            <if test="msType gt 0">and school_type.id &lt;= #{msType}</if>
+        ) as a1 on a2.record_id=a1.record_id left join
+        (select record_id,school.name as dschoolname,doctor_school
+            from user_record,school,school_type
+            where user_record.doctor_school = school.id and school_type.id = school.school_type
+            <if test="dsType gt 0">and school_type.id &lt;= #{dsType}</if>
+        ) as a3 on a2.record_id = a3.record_id
+        <where>
+            <if test="msType gt 0">master_school>0</if>
+            <if test="dsType gt 0">and doctor_school>0</if>
+        </where>
+        order by composite_index desc
+    </select>
+
+    <select id="queryById" parameterType="java.lang.Long" resultType="com.zzu.staff.achievement.entity.UserRecordVo">
+        select user_id,a2.record_id,a2.user_name,idcard,sex,phone_number,nation,nation_name,
+        undergraduate_school,uschoolname,master_school,mschoolname,doctor_school,
+        dschoolname,composite_index,evaluation,department_id,department_name from
+        (select user_id,user_record.record_id,user_name,idcard,sex,phone_number,nation,nation_name,user_record.undergraduate_school,
+        school.name as uschoolname,composite_index,evaluation,user.department_id,department_name
+        from user_record,school,department,user,school_type,index_nation
+        where user_record.undergraduate_school = school.id and user.department_id = department.department_id
+        and us_id = user_id and school.school_type = school_type.id and user.nation = index_nation.nation_id
+        ) as a2 left join
+        (select record_id,school.name as mschoolname,master_school
+        from user_record,school,school_type
+        where user_record.master_school = school.id and school_type.id = school.school_type
+        ) as a1 on a2.record_id=a1.record_id left join
+        (select record_id,school.name as dschoolname,doctor_school
+        from user_record,school,school_type
+        where user_record.doctor_school = school.id and school_type.id = school.school_type
+        ) as a3 on a2.record_id = a3.record_id
+        where user_id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.zzu.staff.achievement.entity.UserRecord">
+        insert into user_record (us_id, undergraduate_school, master_school, doctor_school, composite_index, evaluation)
+        values(#{usId},#{undergraduateSchool},#{masterSchool},#{doctorSchool},#{compositeIndex},#{evaluation})
+    </insert>
+
+    <delete id="deleteById" parameterType="java.lang.Long">
+        delete from user_record where record_id = #{id}
+    </delete>
+
+    <delete id="deleteByUserId" parameterType="java.lang.Long">
+        delete from user_record where us_id = #{id}
+    </delete>
+
+    <update id="update" parameterType="com.zzu.staff.achievement.entity.UserRecord">
+        update user_record
+        <trim prefix="set" suffixOverrides=",">
+            <if test="#{undergraduateSchool}!=null">
+                undergraduate_school = #{undergraduateSchool},
+            </if>
+            <if test="#{masterSchool}!=null">
+                master_school = #{masterSchool},
+            </if>
+            <if test="#{doctorSchool}!=null">
+                doctor_school = #{doctorSchool},
+            </if>
+            <if test="#{compositeIndex}!=null">
+                composite_index  = #{compositeIndex},
+            </if>
+            <if test="#{evaluation}!=null">
+                evaluation = #{evaluation},
+            </if>
+        </trim>
+        where us_id = #{usId}
+    </update>
+</mapper>

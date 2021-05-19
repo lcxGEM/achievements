@@ -24,8 +24,6 @@ public class GradePassage {
 
     private String passageName;
 
-    private String doi;
-
     private Integer schoolOrder;
 
     private Integer authorOrder;
@@ -41,8 +39,6 @@ public class GradePassage {
     private String passageDate;
 
     private String passageUrl;
-
-    private String passageUrl2;
 
     private Float passageGrade;
 

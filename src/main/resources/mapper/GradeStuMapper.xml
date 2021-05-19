@@ -38,6 +38,9 @@
             <if test="stuId!=null and stuId!=''">
                 stu_id = #{stuId},
             </if>
+            <if test="education!=null">
+                education = #{education},
+            </if>
             <if test="boxin!=null">
                 boxin = #{boxin},
             </if>

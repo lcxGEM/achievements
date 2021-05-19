@@ -3,6 +3,7 @@ package com.zzu.staff.achievement.service.impl;
 import com.zzu.staff.achievement.entity.*;
 import com.zzu.staff.achievement.mapper.*;
 import com.zzu.staff.achievement.service.IGradePrizeService;
+import com.zzu.staff.achievement.service.IUserGradeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -10,6 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+/**
+ * 获奖情况，无限制
+ */
 @Service
 public class GradePrizeServiceImpl implements IGradePrizeService {
 
@@ -23,10 +27,7 @@ public class GradePrizeServiceImpl implements IGradePrizeService {
     private UserGradeMapper gradeMapper;
 
     @Autowired
-    private UserMapper userMapper;
-
-    @Autowired
-    private IndexNationMapper nationMapper;
+    private IUserGradeService gradeService;
 
     @Override
     public GradePrize insert(GradePrize prize) {
@@ -50,17 +51,14 @@ public class GradePrizeServiceImpl implements IGradePrizeService {
     public int deleteById(long id) throws Exception {
         GradePrize gradePrize = mapper.queryById(id);
         UserGrade userGrade = gradeMapper.queryById(gradePrize.getGradeId());
-        userGrade.setPrize(userGrade.getPrize()-gradePrize.getPrizeGrade());
-        float sum = userGrade.getSum()-gradePrize.getPrizeGrade();
-        userGrade.setSum(sum);
-        User user = userMapper.queryById(userGrade.getUId());
-        IndexNation nation = nationMapper.queryById(user.getNation());
-        if(sum>nation.getNationLevel()){
-            userGrade.setIndexSum((float)nation.getNationCode());
-        }else{
-            userGrade.setIndexSum(sum/ nation.getNationLevel()* nation.getNationCode());
+        if(userGrade.getStatus()==2||userGrade.getStatus()==1){//已提交待审核、审核通过两个状态不能随意编辑
+            return -3;
         }
-        if(gradeMapper.update(userGrade)==1){
+        userGrade.setPrize(userGrade.getPrize()-gradePrize.getPrizeGrade());//设置获奖积分
+        float sum = userGrade.getSum()-gradePrize.getPrizeGrade();//修改总积分
+        userGrade.setSum(sum);
+        //更新积分信息，并删除该项
+        if(gradeService.update(userGrade)==1){
             if(mapper.deleteById(id)==1){
                 return 1;
             }else{
@@ -76,21 +74,15 @@ public class GradePrizeServiceImpl implements IGradePrizeService {
     public int insertA(GradePrize prize) throws Exception {
         float grade = getGrade(prize);
         prize.setPrizeGrade(grade);
-        System.out.println("--->获奖情况："+prize.toString());
         UserGrade userGrade = gradeMapper.queryById(prize.getGradeId());
-        userGrade.setPrize(userGrade.getPrize()+prize.getPrizeGrade());
-        float sum = userGrade.getSum()+prize.getPrizeGrade();
-        userGrade.setSum(sum);
-
-        User user = userMapper.queryById(userGrade.getUId());
-        IndexNation nation = nationMapper.queryById(user.getNation());
-        if(sum>nation.getNationLevel()){
-            userGrade.setIndexSum((float)nation.getNationCode());
-        }else{
-            userGrade.setIndexSum(sum/ nation.getNationLevel()* nation.getNationCode());
+        if(userGrade.getStatus()==2||userGrade.getStatus()==1){//已提交待审核、审核通过两个状态不能随意编辑
+            return -3;
         }
-
-        if(gradeMapper.update(userGrade)==1){
+        userGrade.setPrize(userGrade.getPrize()+prize.getPrizeGrade());//添加获奖积分
+        float sum = userGrade.getSum()+prize.getPrizeGrade();//更新总积分
+        userGrade.setSum(sum);
+        //更新积分并添加该项
+        if(gradeService.update(userGrade)==1){
             if(mapper.insert(prize)==1){
                 return 1;
             }else{
@@ -106,25 +98,22 @@ public class GradePrizeServiceImpl implements IGradePrizeService {
     public int update(GradePrize prize) throws Exception {
         GradePrize origin = mapper.queryById(prize.getPrizeId());
         UserGrade userGrade = gradeMapper.queryById(prize.getGradeId());
+        if(userGrade.getStatus()==2||userGrade.getStatus()==1){//已提交待审核、审核通过两个状态不能随意编辑
+            return -3;
+        }
         float grade = getGrade(prize);
         prize.setPrizeGrade(grade);
-        System.out.println("--->获奖情况："+prize.toString());
-        if(grade!=origin.getPrizeGrade()){
+        if(grade!=origin.getPrizeGrade()){//判断更新前后的积分有没有变化
+            //有变化先更新积分
             float sum = userGrade.getSum()-origin.getPrizeGrade()+grade;
             userGrade.setSum(sum);
             userGrade.setPrize(userGrade.getPrize()-origin.getPrizeGrade()+grade);
-            User user = userMapper.queryById(userGrade.getUId());
-            IndexNation nation = nationMapper.queryById(user.getNation());
-            if(sum>nation.getNationLevel()){
-                userGrade.setIndexSum((float)nation.getNationCode());
-            }else{
-                userGrade.setIndexSum(sum/ nation.getNationLevel()* nation.getNationCode());
-            }
 
-            if(gradeMapper.update(userGrade)!=1){
+            if(gradeService.update(userGrade)!=1){
                 throw new Exception("grade更新出错！");
             }
         }
+        //无变化直接更新该项
         if(mapper.update(prize)==1) {
             return 1;
         }else {

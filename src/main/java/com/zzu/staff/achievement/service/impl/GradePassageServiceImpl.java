@@ -1,14 +1,13 @@
 package com.zzu.staff.achievement.service.impl;
 
 import com.zzu.staff.achievement.entity.GradePassage;
-import com.zzu.staff.achievement.entity.IndexNation;
 import com.zzu.staff.achievement.entity.User;
 import com.zzu.staff.achievement.entity.UserGrade;
 import com.zzu.staff.achievement.mapper.GradePassageMapper;
-import com.zzu.staff.achievement.mapper.IndexNationMapper;
 import com.zzu.staff.achievement.mapper.UserGradeMapper;
 import com.zzu.staff.achievement.mapper.UserMapper;
 import com.zzu.staff.achievement.service.IGradePassageService;
+import com.zzu.staff.achievement.service.IUserGradeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -17,6 +16,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+/**
+ * 论文
+ * 1、直聘研究员-----nation为 2----->只计算中科院一区的论文
+ * 2、直聘副研究员----nation为 3---->只计算中科院一区、二区的论文
+ * 3、求是学人/求是学者----nation为 9和10---->使用衰减法计算
+ */
 @Service
 public class GradePassageServiceImpl implements IGradePassageService {
 
@@ -32,6 +37,12 @@ public class GradePassageServiceImpl implements IGradePassageService {
     @Value("${passage.B}")
     private int B;
 
+    @Value("${passage.C}")
+    private int C;
+
+    @Value("${passage.D}")
+    private int D;
+
     @Autowired
     private GradePassageMapper mapper;
 
@@ -42,7 +53,7 @@ public class GradePassageServiceImpl implements IGradePassageService {
     private UserMapper userMapper;
 
     @Autowired
-    private IndexNationMapper nationMapper;
+    private IUserGradeService gradeService;
 
     @Override
     public GradePassage insert(GradePassage passage) {
@@ -64,24 +75,24 @@ public class GradePassageServiceImpl implements IGradePassageService {
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
     public int deleteById(long id) throws Exception {
-        GradePassage passage =  mapper.queryById(id);
+        GradePassage passage =  mapper.queryById(id);//先获取原论文
+        UserGrade userGrade = gradeMapper.queryById(passage.getGradeId());//获取积分
+        if(userGrade.getStatus()==2||userGrade.getStatus()==1){//已提交待审核、审核通过两个状态不能随意编辑
+            return -3;
+        }
+        User user = userMapper.queryById(userGrade.getUId());//获取教师信息，主要是身份
+        if(user==null){
+            return -1;
+        }
         List<GradePassage> passageList = mapper.queryByGradeId(passage.getGradeId());//获取所有论文
-        UserGrade userGrade = gradeMapper.queryById(passage.getGradeId());
         //计算论文总分
-        float sumPass = calculateSum(passageList,id);
+        float sumPass = calculateSum(passageList,id,user.getNation());
         //总分计算完毕，更新userGrade
         float sum = userGrade.getSum()-userGrade.getPassage()+sumPass;
         userGrade.setSum(sum);
-
-        User user = userMapper.queryById(userGrade.getUId());
-        IndexNation nation = nationMapper.queryById(user.getNation());
-        if(sum>nation.getNationLevel()){
-            userGrade.setIndexSum((float)nation.getNationCode());
-        }else{
-            userGrade.setIndexSum(sum/ nation.getNationLevel()* nation.getNationCode());
-        }
         userGrade.setPassage(sumPass);
-        if(gradeMapper.update(userGrade)==1) {
+
+        if(gradeService.update(userGrade)==1) {
             if(mapper.deleteById(id)==1){
                 return 1;
             }else{
@@ -95,26 +106,38 @@ public class GradePassageServiceImpl implements IGradePassageService {
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
     public int insertA(GradePassage passage) throws Exception {
+        UserGrade userGrade = gradeMapper.queryById(passage.getGradeId());
+        if(userGrade.getStatus()==2||userGrade.getStatus()==1){//已提交待审核、审核通过两个状态不能随意编辑
+            return -3;
+        }
+        User user = userMapper.queryById(userGrade.getUId());
+        if(user==null){
+            return -1;
+        }
+        //1、直聘研究员-----nation为 2----->只计算中科院一区的论文
+        if(user.getNation()==2){
+            if (passage.getPartition()!=1){//直聘研究员且论文分区不是一区，直接返回，不添加
+                return -2;
+            }
+        }
+        //2、直聘副研究员----nation为 3---->只计算中科院一区、二区的论文
+        if(user.getNation()==3){
+            if(passage.getPartition()!=1&&passage.getPartition()!=2){
+                return -2;
+            }
+        }
         float grade = getGrade(passage);
         passage.setPassageGrade(grade);
         List<GradePassage> passageList = mapper.queryByGradeId(passage.getGradeId());//获取所有论文
-        UserGrade userGrade = gradeMapper.queryById(passage.getGradeId());
+
         passageList.add(passage);
-        float sumPass = calculateSum(passageList,0l);
+        float sumPass = calculateSum(passageList,0l,user.getNation());
         //总分计算完毕，更新userGrade
         float sum  = userGrade.getSum()-userGrade.getPassage()+sumPass;
         userGrade.setSum(sum);
-
-        User user = userMapper.queryById(userGrade.getUId());
-        IndexNation nation = nationMapper.queryById(user.getNation());
-        if(sum>nation.getNationLevel()){
-            userGrade.setIndexSum((float)nation.getNationCode());
-        }else{
-            userGrade.setIndexSum(sum/ nation.getNationLevel()* nation.getNationCode());
-        }
-
         userGrade.setPassage(sumPass);
-        if(gradeMapper.update(userGrade)==1) {
+
+        if(gradeService.update(userGrade)==1) {
             if(mapper.insert(passage)==1){
                 return 1;
             }else {
@@ -128,26 +151,37 @@ public class GradePassageServiceImpl implements IGradePassageService {
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
     public int update(GradePassage passage) throws Exception {
+        UserGrade userGrade = gradeMapper.queryById(passage.getGradeId());
+        if(userGrade.getStatus()==2||userGrade.getStatus()==1){//已提交待审核、审核通过两个状态不能随意编辑
+            return -3;
+        }
+        User user = userMapper.queryById(userGrade.getUId());
+        if(user==null){
+            return -1;
+        }
         float grade = getGrade(passage);
+
+        //1、直聘研究员-----nation为 2----->只计算中科院一区的论文
+        if(user.getNation()==2){
+            if (passage.getPartition()!=1){//直聘研究员且论文分区不是一区，直接返回，不添加
+                grade = 0;
+            }
+        }
+        //2、直聘副研究员----nation为 3---->只计算中科院一区、二区的论文
+        if(user.getNation()==3){
+            if(passage.getPartition()!=1&&passage.getPartition()!=2){
+                grade = 0;
+            }
+        }
         passage.setPassageGrade(grade);
         List<GradePassage> passageList = mapper.queryByGradeId(passage.getGradeId());//获取所有论文
-        UserGrade userGrade = gradeMapper.queryById(passage.getGradeId());
         passageList.remove(passage);
         passageList.add(passage);
-        float sumPass = calculateSum(passageList,0l);
+        float sumPass = calculateSum(passageList,0l,user.getNation());
         float sum = userGrade.getSum()-userGrade.getPassage()+sumPass;
         userGrade.setSum(sum);
         userGrade.setPassage(sumPass);
-
-        User user = userMapper.queryById(userGrade.getUId());
-        IndexNation nation = nationMapper.queryById(user.getNation());
-        if(sum>nation.getNationLevel()){
-            userGrade.setIndexSum((float)nation.getNationCode());
-        }else{
-            userGrade.setIndexSum(sum/ nation.getNationLevel()* nation.getNationCode());
-        }
-
-        if(gradeMapper.update(userGrade)==1) {
+        if(gradeService.update(userGrade)==1) {
             if(mapper.update(passage)==1){
                 return 1;
             }else{
@@ -190,53 +224,70 @@ public class GradePassageServiceImpl implements IGradePassageService {
             }else {
                 return 0;
             }
-        }else {
+        }else if(level==5){ //C级
+            if (passage.getAuthorOrder()==1){
+                return C;
+            }else {
+                return 0;
+            }
+        }else if(level==6){ //D级
+            if (passage.getAuthorOrder()==1){
+                return D;
+            }else {
+                return 0;
+            }
+        }else{
             return 0;
         }
     }
 
-    private float calculateSum(List<GradePassage> passageList,long id){
+    private float calculateSum(List<GradePassage> passageList,long id,int nation){
         float sumPass=0l;
-        int numTOP = 0,numA=0,numB=0;
+        int numTOP = 0,numA=0,numB=0,numC=0,numD=0;
         for (GradePassage pass:passageList) {
             int level = pass.getLevel();
             if(pass.getPassageId()==null||pass.getPassageId()==id){//要删除的论文
                 continue;//不计算这篇论文
             }
+            if(pass.getPassageGrade()<=0){ //论文分为0，不计算的论文
+                continue;
+            }
             if(level==1){ //顶尖期刊
                 sumPass+=pass.getPassageGrade();
             }else if(level==2){ //TOP级
-                if(pass.getPassageGrade()>0){
-                    numTOP++;
-                }
+                numTOP++;
             }else if(level==3){ //A级
-                if(pass.getPassageGrade()>0){
-                    numA++;
-                }
+                numA++;
             }else if(level==4){ //B级
-                if(pass.getPassageGrade()>0){
-                    numB++;
-                }
+                numB++;
+            }else if(level==5){ //C级
+                numC++;
+            }else if(level==6){ //D级
+                numD++;
             }else {
                 continue;
             }
         }
-
-        if(numTOP>3){
-            sumPass+=((Math.pow(Math.E,4-numTOP)/12+3)*TOP);
+        if(nation==9||nation==10) { //3、求是学人/求是学者----nation为 9和10---->使用衰减法计算
+            if (numTOP > 3) {
+                sumPass += ((Math.pow(Math.E, 4 - numTOP) / 12 + 3) * TOP);
+            } else {
+                sumPass += (numTOP * TOP);
+            }
+            if (numA > 3) {
+                sumPass += ((Math.pow(Math.E, 4 - numTOP) / 12 + 3) * A);
+            } else {
+                sumPass += (numA * A);
+            }
+            if (numB > 1) {
+                sumPass += ((Math.pow(Math.E, 2 - numTOP) / 12 + 1) * B);
+            } else {
+                sumPass += (numB * B);
+            }
         }else{
-            sumPass+=(numTOP*TOP);
+            sumPass = sumPass + numTOP*TOP + numA*A + numB*B ;
         }
-        if (numA>3){
-            sumPass+=((Math.pow(Math.E,4-numTOP)/12+3)*A);
-        }else {
-            sumPass+=(numA*A);
-        }
-        if(numB>1){
-            sumPass+=((Math.pow(Math.E,2-numTOP)/12+1)*B);
-        }else{
-            sumPass+=(numB*B);
-        }
+        sumPass = sumPass + numC*C +numD*D;
         return sumPass;
     }
 }

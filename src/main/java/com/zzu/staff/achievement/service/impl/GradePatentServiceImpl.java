@@ -1,14 +1,11 @@
 package com.zzu.staff.achievement.service.impl;
 
 import com.zzu.staff.achievement.entity.GradePatent;
-import com.zzu.staff.achievement.entity.IndexNation;
-import com.zzu.staff.achievement.entity.User;
 import com.zzu.staff.achievement.entity.UserGrade;
 import com.zzu.staff.achievement.mapper.GradePatentMapper;
-import com.zzu.staff.achievement.mapper.IndexNationMapper;
 import com.zzu.staff.achievement.mapper.UserGradeMapper;
-import com.zzu.staff.achievement.mapper.UserMapper;
 import com.zzu.staff.achievement.service.IGradePatentService;
+import com.zzu.staff.achievement.service.IUserGradeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -17,6 +14,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+/**
+ * 专利情况，无要求
+ *
+ */
 @Service
 public class GradePatentServiceImpl implements IGradePatentService {
 
@@ -33,10 +34,8 @@ public class GradePatentServiceImpl implements IGradePatentService {
     private UserGradeMapper gradeMapper;
 
     @Autowired
-    private UserMapper userMapper;
+    private IUserGradeService gradeService;
 
-    @Autowired
-    private IndexNationMapper nationMapper;
 
     @Override
     public GradePatent insert(GradePatent patent) {
@@ -60,19 +59,14 @@ public class GradePatentServiceImpl implements IGradePatentService {
     public int deleteById(long id) throws Exception {
         GradePatent gradePatent = mapper.queryById(id);
         UserGrade userGrade = gradeMapper.queryById(gradePatent.getGradeId());
+        if(userGrade.getStatus()==2||userGrade.getStatus()==1){//已提交待审核、审核通过两个状态不能随意编辑
+            return -3;
+        }
         userGrade.setPatent(userGrade.getPatent()-gradePatent.getPatentGrade());
         float sum = userGrade.getSum()-gradePatent.getPatentGrade();
         userGrade.setSum(sum);
 
-        User user = userMapper.queryById(userGrade.getUId());
-        IndexNation nation = nationMapper.queryById(user.getNation());
-        if(sum>nation.getNationLevel()){
-            userGrade.setIndexSum((float)nation.getNationCode());
-        }else{
-            userGrade.setIndexSum(sum/ nation.getNationLevel()* nation.getNationCode());
-        }
-
-        if(gradeMapper.update(userGrade)==1){
+        if(gradeService.update(userGrade)==1){
             if(mapper.deleteById(id)==1){
                 return 1;
             }else{
@@ -88,19 +82,15 @@ public class GradePatentServiceImpl implements IGradePatentService {
     public int insertA(GradePatent patent) throws Exception {
         int grade = getGrade(patent);
         patent.setPatentGrade(grade);
-        System.out.println("--->专利："+patent.toString());
         UserGrade userGrade = gradeMapper.queryById(patent.getGradeId());
+        if(userGrade.getStatus()==2||userGrade.getStatus()==1){//已提交待审核、审核通过两个状态不能随意编辑
+            return -3;
+        }
         userGrade.setPatent(userGrade.getPatent()+patent.getPatentGrade());
         float sum = userGrade.getSum()+patent.getPatentGrade();
         userGrade.setSum(sum);
-        User user = userMapper.queryById(userGrade.getUId());
-        IndexNation nation = nationMapper.queryById(user.getNation());
-        if(sum>nation.getNationLevel()){
-            userGrade.setIndexSum((float)nation.getNationCode());
-        }else{
-            userGrade.setIndexSum(sum/ nation.getNationLevel()* nation.getNationCode());
-        }
-        if(gradeMapper.update(userGrade)==1){
+
+        if(gradeService.update(userGrade)==1){
             if(mapper.insert(patent)==1){
                 return 1;
             }else{
@@ -116,21 +106,18 @@ public class GradePatentServiceImpl implements IGradePatentService {
     public int update(GradePatent patent) throws Exception {
         GradePatent origin = mapper.queryById(patent.getPatentId());
         UserGrade userGrade = gradeMapper.queryById(patent.getGradeId());
+        if(userGrade.getStatus()==2||userGrade.getStatus()==1){//已提交待审核、审核通过两个状态不能随意编辑
+            return -3;
+        }
         int grade = getGrade(patent);
         patent.setPatentGrade(grade);
         System.out.println("--->专利："+patent.toString());
         if(origin.getPatentGrade()!=grade){
+            userGrade.setPatent(userGrade.getPatent()-origin.getPatentGrade()+grade);
             float sum = userGrade.getSum()-origin.getPatentGrade()+grade;
             userGrade.setSum(sum);
-            User user = userMapper.queryById(userGrade.getUId());
-            IndexNation nation = nationMapper.queryById(user.getNation());
-            if(sum>nation.getNationLevel()){
-                userGrade.setIndexSum((float)nation.getNationCode());
-            }else{
-                userGrade.setIndexSum(sum/ nation.getNationLevel()* nation.getNationCode());
-            }
-            userGrade.setPatent(userGrade.getPatent()-origin.getPatentGrade()+grade);
-            if(gradeMapper.update(userGrade)!=1){
+
+            if(gradeService.update(userGrade)!=1){
                 throw new Exception("grade更新出错！");
             }
         }

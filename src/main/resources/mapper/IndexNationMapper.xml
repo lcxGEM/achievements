@@ -10,8 +10,8 @@
     </select>
 
     <insert id="insert" parameterType="com.zzu.staff.achievement.entity.IndexNation">
-        insert into index_nation (nation_name, nation_code, nation_level)
-        values (#{nationName},#{nationCode},#{nationLevel})
+        insert into index_nation (nation_name, nation_code, nation_level,composite_code,composite_level,qualified)
+        values (#{nationName},#{nationCode},#{nationLevel},#{compositeCode},#{compositeLevel},#{qualified})
     </insert>
 
     <delete id="deleteById" parameterType="java.lang.Integer">
@@ -29,6 +29,15 @@
             </if>
             <if test="nationLevel!=null">
                 nation_level = #{nationLevel},
+            </if>
+            <if test="compositeCode!=null">
+                composite_code = #{compositeCode},
+            </if>
+            <if test="compositeLevel!=null">
+                composite_level = #{compositeLevel},
+            </if>
+            <if test="qualified!=null">
+                qualified = #{qualified},
             </if>
         </trim>
         where nation_id = #{nationId}

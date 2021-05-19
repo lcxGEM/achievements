@@ -2,8 +2,50 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.zzu.staff.achievement.mapper.ManagerMapper">
 
-    <select id="queryById" parameterType="java.lang.Long" resultType="com.zzu.staff.achievement.entity.Manager">
+    <select id="queryById" parameterType="java.lang.Integer" resultType="com.zzu.staff.achievement.entity.Manager">
         select * from manager,department where id= #{id} and department = department_id
     </select>
+
+    <select id="queryAll" resultType="com.zzu.staff.achievement.entity.Manager">
+        select * from manager,department where department = department_id
+    </select>
+
+    <select id="searchAll" parameterType="java.lang.Integer" resultType="com.zzu.staff.achievement.entity.Manager">
+        select id, name, passwd,department,department_name
+        from manager,department
+        <where>
+            <if test="true">department = department_id</if>
+            <if test="department gt -1">and department = #{department}</if>
+            <if test="#{trim}!=''">and name like CONCAT('%',#{trim},'%')</if>
+        </where>
+    </select>
+
+    <insert id="insert" parameterType="com.zzu.staff.achievement.entity.Manager">
+        insert into manager (name, passwd,department)
+        values(#{name},#{passwd},#{department})
+    </insert>
+
+    <delete id="deleteById" parameterType="java.lang.Integer">
+        delete from manager where id = #{id}
+    </delete>
+
+    <update id="update" parameterType="com.zzu.staff.achievement.entity.Manager">
+        update manager set
+        <if test="name!=null">
+            name = #{name},
+        </if>
+        <if test="passwd!=null">
+            passwd = #{passwd},
+        </if>
+        <if test="department!=null">
+            department = #{department}
+        </if>
+        where id = #{id}
+    </update>
+
+    <update id="changePasswd">
+        update manager set passwd = #{passwd} where id =#{id}
+    </update>
+
 
 </mapper>

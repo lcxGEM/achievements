@@ -13,7 +13,7 @@ public class HandlerDataUtil {
         Integer sex = new Integer((String) user.get("sex"));
         Integer people = new Integer((String) user.get("peopleCategory"));//1在职 2引进
         String nativePlace = (String) user.get("nativePlace");
-        String politicsStatus = (String) user.get("politicsStatus");
+        Integer politicsStatus = new Integer((String) user.get("politicsStatus"));
         Integer nation = new Integer((String) user.get("nation"));
         String tel = (String) user.get("phoneNumber");
         String idCard = (String) user.get("idcard");
@@ -54,7 +54,6 @@ public class HandlerDataUtil {
             System.out.println("----------------------"+pass.toString());
             Integer level = new Integer((String) pass.get("level"));
             String passName = (String) pass.get("passageName");
-            String doi = (String) pass.get("DOI");
             Integer school;
             if(flag==1){
                 school = new Integer((String) pass.get("schoolOrder"));
@@ -72,8 +71,8 @@ public class HandlerDataUtil {
             String passageDate = (String) pass.get("passageDate");
             String passageUrl1 = (String) pass.get("passageUrl1");
             String passageUrl2 = (String) pass.get("passageUrl2");
-            GradePassage passage = new GradePassage(null,null,level,passName,doi,school,author,
-                    isOne,noeNum,partition,journal,passageDate,passageUrl1,passageUrl2,null);
+            GradePassage passage = new GradePassage(null,null,level,passName,school,author,
+                    isOne,noeNum,partition,journal,passageDate,passageUrl1,null);
             passageList.add(passage);
             System.out.println("---------已装配-------------"+passage.toString());
         }

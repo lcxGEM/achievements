@@ -25,9 +25,10 @@
     </insert>
 
     <insert id="insertA" parameterType="com.zzu.staff.achievement.entity.UserGrade">
-        insert into user_grade (grade_id,u_id, year, stu, talent, passage, program, prize, patent, result,sum,index_sum)
-        values (#{gradeId},#{uId},#{year},#{stu},#{talent},#{passage},#{program},
-                #{prize},#{patent},#{result},#{sum},#{indexSum})
+        insert into user_grade (grade_id, u_id, year, stu, talent, passage, program, prize, patent, result,
+                                sum, index_sum, com_sum, index_com_sum, res_sum, is_res)
+        values (#{gradeId},#{uId},#{year},#{stu},#{talent},#{passage},#{program},#{prize},#{patent},#{result},
+                #{sum},#{indexSum},#{comSum},#{indexComSum},#{resSum},#{isRes})
     </insert>
 
 
@@ -59,15 +60,28 @@
             <if test="result!=null">
                 result = #{result},
             </if>
-            <if test="sum!=null and sum!=''">
+            <if test="sum &gt;=0">
                 sum = #{sum},
-            </if>
-            <if test="status &gt;=0">
-                `status` = #{status},
             </if>
             <if test="indexSum &gt;=0">
                 index_sum = #{indexSum},
             </if>
+            <if test="comSum &gt;=0">
+                com_sum = #{comSum},
+            </if>
+            <if test="indexComSum &gt;=0">
+                index_com_sum = #{indexComSum},
+            </if>
+            <if test="resSum &gt;=0">
+                res_sum = #{resSum},
+            </if>
+            <if test="isRes!=null">
+                is_res = #{isRes},
+            </if>
+            <if test="status &gt;=0">
+                `status` = #{status},
+            </if>
+
         </trim>
         where grade_id = #{gradeId}
     </update>

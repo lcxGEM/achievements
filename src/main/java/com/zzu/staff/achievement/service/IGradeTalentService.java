@@ -9,4 +9,6 @@ public interface IGradeTalentService {
     GradeTalent queryByGradeId(long id);
 
     int update(GradeTalent talent) throws Exception;
+
+    int insertA(GradeTalent talent) throws Exception;
 }

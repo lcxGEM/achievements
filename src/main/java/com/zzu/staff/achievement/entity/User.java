@@ -21,9 +21,9 @@ public class User {
 
     private String nativePlace; //籍贯
 
-    private String politicsStatus; //政治面貌
+    private Integer politicsStatus; //政治面貌
 
-    private Integer nation; //等级
+    private Integer nation; //岗位类别
 
     private String phoneNumber; //联系方式
 

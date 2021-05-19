@@ -3,6 +3,7 @@ package com.zzu.staff.achievement.service.impl;
 import com.zzu.staff.achievement.entity.*;
 import com.zzu.staff.achievement.mapper.*;
 import com.zzu.staff.achievement.service.IGradeProService;
+import com.zzu.staff.achievement.service.IUserGradeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -10,6 +11,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
+/**
+ * 科研项目
+ * 求是学人 9 计算的时候不计算中国博士后科学基金特别资助项目
+ */
 @Service
 public class GradeProServiceImpl implements IGradeProService {
 
@@ -27,6 +32,9 @@ public class GradeProServiceImpl implements IGradeProService {
 
     @Autowired
     private IndexNationMapper nationMapper;
+
+    @Autowired
+    private IUserGradeService gradeService;
 
     @Override
     public GradePro insert(GradePro pro) {
@@ -48,21 +56,16 @@ public class GradeProServiceImpl implements IGradeProService {
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
     public int deleteById(long id) throws Exception {
-        GradePro pro = mapper.queryById(id);
-        UserGrade userGrade = gradeMapper.queryById(pro.getGradeId());
-        userGrade.setProgram(userGrade.getProgram()-pro.getProGrade());
-        float sum = userGrade.getSum()-pro.getProGrade();
+        GradePro pro = mapper.queryById(id);//查询科研项目
+        UserGrade userGrade = gradeMapper.queryById(pro.getGradeId());//查询业绩
+        if(userGrade.getStatus()==2||userGrade.getStatus()==1){//已提交待审核、审核通过两个状态不能随意编辑
+            return -3;
+        }
+        userGrade.setProgram(userGrade.getProgram()-pro.getProGrade());//计算科研项目分
+        float sum = userGrade.getSum()-pro.getProGrade();//计算总分
         userGrade.setSum(sum);
 
-        User user = userMapper.queryById(userGrade.getUId());
-        IndexNation nation = nationMapper.queryById(user.getNation());
-        if(sum>nation.getNationLevel()){
-            userGrade.setIndexSum((float)nation.getNationCode());
-        }else{
-            userGrade.setIndexSum(sum/ nation.getNationLevel()* nation.getNationCode());
-        }
-
-        if(gradeMapper.update(userGrade)==1) {
+        if(gradeService.update(userGrade)==1) {
             if(mapper.deleteById(id)==1){
                 return 1;
             }else {
@@ -76,63 +79,65 @@ public class GradeProServiceImpl implements IGradeProService {
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
     public int insertA(GradePro pro) throws Exception {
-        float grade = getGrade(pro);
-        pro.setProGrade(grade);
-        System.out.println("--->科研："+pro.toString());
         UserGrade userGrade = gradeMapper.queryById(pro.getGradeId());
-        userGrade.setProgram(userGrade.getProgram()+pro.getProGrade());
-        float sum = userGrade.getSum()+pro.getProGrade();
-        userGrade.setSum(sum);
-
-        User user = userMapper.queryById(userGrade.getUId());
-        IndexNation nation = nationMapper.queryById(user.getNation());
-        if(sum>nation.getNationLevel()){
-            userGrade.setIndexSum((float)nation.getNationCode());
-        }else{
-            userGrade.setIndexSum(sum/ nation.getNationLevel()* nation.getNationCode());
+        if(userGrade.getStatus()==2||userGrade.getStatus()==1){//已提交待审核、审核通过两个状态不能随意编辑
+            return -3;
         }
+        User user = userMapper.queryById(userGrade.getUId());
+        if(user==null){
+            return -1;
+        }
+        if(user.getNation()==9&&pro.getProLevel()==26){//求是学人
+            return -2;
+        }else{
+            float grade = getGrade(pro);
+            pro.setProGrade(grade);
+            userGrade.setProgram(userGrade.getProgram()+pro.getProGrade());
+            float sum = userGrade.getSum()+pro.getProGrade();
+            userGrade.setSum(sum);
 
-        if(gradeMapper.update(userGrade)==1) {
-            if(mapper.insert(pro)==1){
-                return 1;
+            if(gradeService.update(userGrade)==1) {
+                if(mapper.insert(pro)==1){
+                    return 1;
+                }else {
+                    throw new Exception("pro添加出错！");
+                }
             }else {
-                throw new Exception("pro添加出错！");
+                throw  new Exception("grade更新出错！");
             }
-        }else {
-            throw  new Exception("grade更新出错！");
         }
     }
 
     @Override
     @Transactional(propagation = Propagation.REQUIRED)
     public int update(GradePro pro) throws Exception {
-        GradePro origin  = mapper.queryById(pro.getProgramId());
-        float grade = getGrade(pro);
-        pro.setProGrade(grade);
-        System.out.println("--->科研："+pro.toString());
-
         UserGrade userGrade = gradeMapper.queryById(pro.getGradeId());
-        if(origin.getProGrade()!=grade) {
-            userGrade.setProgram(userGrade.getProgram() + grade - origin.getProGrade());
-            float sum = userGrade.getSum() + grade - origin.getProGrade();
-            userGrade.setSum(sum);
-
-            User user = userMapper.queryById(userGrade.getUId());
-            IndexNation nation = nationMapper.queryById(user.getNation());
-            if(sum>nation.getNationLevel()){
-                userGrade.setIndexSum((float)nation.getNationCode());
-            }else{
-                userGrade.setIndexSum(sum/ nation.getNationLevel()* nation.getNationCode());
-            }
-
-            if(gradeMapper.update(userGrade)!=1){
-                throw new Exception("grade更新出错");
-            }
+        if(userGrade.getStatus()==2||userGrade.getStatus()==1){//已提交待审核、审核通过两个状态不能随意编辑
+            return -3;
         }
-        if(mapper.update(pro)==1){
-            return 1;
-        }else{
-            throw new Exception("pass更新出错！");
+        User user = userMapper.queryById(userGrade.getUId());
+        if(user==null){
+            return -1;
+        }
+        if(user.getNation()==9&&pro.getProLevel()==26){//求是学人
+            return -2;
+        }else {
+            GradePro origin = mapper.queryById(pro.getProgramId());
+            float grade = getGrade(pro);
+            pro.setProGrade(grade);
+            if (origin.getProGrade() != grade) {
+                userGrade.setProgram(userGrade.getProgram() + grade - origin.getProGrade());
+                float sum = userGrade.getSum() + grade - origin.getProGrade();
+                userGrade.setSum(sum);
+                if (gradeService.update(userGrade) != 1) {
+                    throw new Exception("grade更新出错");
+                }
+            }
+            if (mapper.update(pro) == 1) {
+                return 1;
+            } else {
+                throw new Exception("pass更新出错！");
+            }
         }
     }
 

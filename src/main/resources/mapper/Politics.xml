@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzu.staff.achievement.mapper.PoliticsMapper">
+    <select id="queryAll" resultType="com.zzu.staff.achievement.entity.Politics">
+        select * from politics
+    </select>
+
+    <select id="queryById" parameterType="java.lang.Integer" resultType="com.zzu.staff.achievement.entity.Politics">
+        select * from politics where politics_id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.zzu.staff.achievement.entity.Politics">
+        insert into politics (politics_name)
+        values (#{politicsName})
+    </insert>
+
+    <delete id="deleteById" parameterType="java.lang.Integer">
+        delete from politics where politics_id = #{id}
+    </delete>
+
+    <update id="update" parameterType="com.zzu.staff.achievement.entity.Politics">
+        update politics
+        <trim prefix="set" suffixOverrides=",">
+            <if test="politicsName!=null and politicsName!=''">
+                politics_name = #{politicsName},
+            </if>
+        </trim>
+        where politics_id = #{politicsId}
+    </update>
+</mapper>

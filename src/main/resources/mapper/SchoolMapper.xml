@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzu.staff.achievement.mapper.SchoolMapper">
+    <!--开启mybatis二级缓存，开启后entity类要实现Serializable序列化接口-->
+    <select id="queryAll" resultType="com.zzu.staff.achievement.entity.School">
+        select * from school
+    </select>
+
+    <select id="queryAllVo" resultType="com.zzu.staff.achievement.entity.SchoolVo">
+        select school.id,name,school_type,type_name,sort from school inner join school_type on school.school_type = school_type.id
+    </select>
+
+    <select id="queryByName" resultType="com.zzu.staff.achievement.entity.School" parameterType="java.lang.String">
+        select * from school where name = #{name}
+    </select>
+
+    <select id="searchAllVo" resultType="com.zzu.staff.achievement.entity.SchoolVo">
+        select school.id,name,school_type,type_name,sort from school inner join school_type on school.school_type = school_type.id
+        <where>
+            <if test="sType gt 0">
+                school_type = #{sType}
+            </if>
+            <if test="#{sName}!=''">
+                and name like CONCAT('%',#{sName},'%')
+            </if>
+        </where>
+
+        order by sort
+    </select>
+
+    <select id="queryById" parameterType="java.lang.Long" resultType="com.zzu.staff.achievement.entity.School">
+        select * from school where id = #{id}
+    </select>
+
+    <insert id="insert" parameterType="com.zzu.staff.achievement.entity.School">
+        insert into school (name,school_type,sort) values(#{name},#{schoolType},#{sort})
+    </insert>
+
+    <delete id="deleteById" parameterType="java.lang.Long">
+        delete from school where id = #{id}
+    </delete>
+
+    <delete id="deleteByType" parameterType="java.lang.Integer">
+        delete from school WHERE school_type = #{type}
+    </delete>
+
+    <update id="update" parameterType="com.zzu.staff.achievement.entity.School">
+        update school set
+        <if test="#{name}!=null">
+            name = #{name},
+        </if>
+        <if test="#{sort}!=null">
+            sort = #{sort},
+        </if>
+        <if test="#{schoolType}!=null">
+            school_type = #{schoolType}
+        </if>
+        where id = #{id}
+    </update>
+</mapper>
